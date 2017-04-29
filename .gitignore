@@ -1,0 +1,13 @@
+/**/target/
+/**/dependency-reduced-pom.xml
+log.txt
+
+# IntelliJ
+.idea
+*.iml
+
+# Eclipse
+.project
+.classpath
+.settings
+
