@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -80,14 +82,25 @@ public class GameScreen implements Screen {
 	private final AtomicInteger _tankDamageIncrement = new AtomicInteger();
 
 	private final Map<Address, Set<String>> _channelMembers = new HashMap<>();
+	private final InputProcessor _inputProcessor = new InputAdapter() {
+
+		@Override
+		public boolean keyDown(final int keycode) {
+			if (keycode == Keys.M) {
+				toggleMusic();
+				return true;
+			}
+			return super.keyDown(keycode);
+		}
+
+	};
 
 	private int _textLine;
-
 	private Texture _bulletImage;
 	private Texture _tankImage;
 	private Texture _turretImage;
 	private Sound _shotSound;
-	private Music _backgroundMusic;
+	private Music _music;
 	private OrthographicCamera _camera;
 
 	public GameScreen(final Tanks pGame) {
@@ -101,8 +114,8 @@ public class GameScreen implements Screen {
 		_turretImage.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
 
 		_shotSound = Gdx.audio.newSound(Gdx.files.internal("Shot.wav"));
-		_backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Music.mp3"));
-		_backgroundMusic.setLooping(true);
+		_music = Gdx.audio.newMusic(Gdx.files.internal("Music.mp3"));
+		_music.setLooping(true);
 
 		_camera = new OrthographicCamera();
 		_camera.setToOrtho(false, VIEWPORT_W, VIEWPORT_H);
@@ -162,11 +175,12 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		Gdx.input.setInputProcessor(null);
 		_channel.close();
 		_bulletImage.dispose();
 		_tankImage.dispose();
 		_shotSound.dispose();
-		_backgroundMusic.dispose();
+		_music.dispose();
 	}
 
 	@Override
@@ -251,7 +265,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		_backgroundMusic.play();
+		Gdx.input.setInputProcessor(_inputProcessor);
+		_music.play();
 	}
 
 	private void draw(final Texture pTexture, final float pCX, final float pCY, final int pW, final int pH, final float pR) {
@@ -390,14 +405,6 @@ public class GameScreen implements Screen {
 			}
 		}
 
-		if (Gdx.input.isKeyPressed(Keys.M)) {
-			if (_backgroundMusic.isPlaying()) {
-				_backgroundMusic.stop();
-			} else {
-				_backgroundMusic.play();
-			}
-		}
-
 		return tankDirty;
 	}
 
@@ -407,6 +414,14 @@ public class GameScreen implements Screen {
 		final Bullet bullet = new Bullet(pTank.getUuid(), state._centerX, state._centerY, state._rotation + state._turretRotation);
 		_state._bullets.put(bullet.getUuid(), bullet);
 		networkSend(bullet);
+	}
+
+	private void toggleMusic() {
+		if (_music.isPlaying()) {
+			_music.stop();
+		} else {
+			_music.play();
+		}
 	}
 
 }
