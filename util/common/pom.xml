@@ -20,18 +20,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>de.hasait.tanks</groupId>
-		<artifactId>tanks.app</artifactId>
+		<artifactId>tanks.util</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>tanks.app.common</artifactId>
+	<artifactId>tanks.util.common</artifactId>
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
-			<groupId>de.hasait.tanks</groupId>
-			<artifactId>tanks.util.common</artifactId>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jgroups</groupId>
+			<artifactId>jgroups</artifactId>
 		</dependency>
 	</dependencies>
 </project>

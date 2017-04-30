@@ -33,10 +33,11 @@ public class UpdateMsg implements Serializable {
 	public final Set<TankState> _tanks = new HashSet<>();
 	public final Set<BulletState> _bullets = new HashSet<>();
 	public final Set<String> _removedBullets = new HashSet<>();
+	public final Set<String> _removedTanks = new HashSet<>();
 	public final List<String> _incrementDamage = new ArrayList<>();
 
 	public boolean isEmpty() {
-		return _tanks.isEmpty() && _bullets.isEmpty() && _removedBullets.isEmpty() && _incrementDamage.isEmpty();
+		return _tanks.isEmpty() && _bullets.isEmpty() && _removedBullets.isEmpty() && _removedTanks.isEmpty() && _incrementDamage.isEmpty();
 	}
 
 }

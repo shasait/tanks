@@ -27,21 +27,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.TimeUtils;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -54,17 +51,17 @@ import de.hasait.tanks.app.common.model.State;
 import de.hasait.tanks.app.common.model.Tank;
 import de.hasait.tanks.app.common.model.TankState;
 import de.hasait.tanks.app.common.msg.UpdateMsg;
+import de.hasait.tanks.util.common.Abstract2DScreen;
+import de.hasait.tanks.util.common.Util;
 
 /**
  *
  */
-public class GameScreen implements Screen {
+public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	private static final int VIEWPORT_W = 1280;
 	private static final int VIEWPORT_H = 720;
 	private static final Rectangle VIEWPORT_R = new Rectangle(0, 0, VIEWPORT_W, VIEWPORT_H);
-	private static final int TEXT_MARGIN = 10;
-	private static final int TEXT_LINE_H = 30;
 
 	private static final int TANK_W = 32;
 	private static final int TANK_H = 32;
@@ -72,8 +69,11 @@ public class GameScreen implements Screen {
 	private static final int TURRET_H = TANK_H * 3 / 4;
 	private static final int BULLET_W = TANK_W / 4;
 	private static final int BULLET_H = TANK_H / 4;
+	private static final int MAX_DAMAGE = 5;
+	private static final long TIME_MILLIS_BETWEEN_SHOTS = 1000;
+	private static final long RESPAWN_TIME_MILLIS = TimeUnit.SECONDS.toMillis(10);
 
-	private final Tanks _game;
+	private final MainMenuScreen _mainMenuScreen;
 
 	private final JChannel _channel;
 
@@ -82,12 +82,12 @@ public class GameScreen implements Screen {
 	private final AtomicInteger _tankDamageIncrement = new AtomicInteger();
 
 	private final Map<Address, Set<String>> _channelMembers = new HashMap<>();
-	private final InputProcessor _inputProcessor = new InputAdapter() {
+	private final InputProcessor _toggleBackgroundMusicInputProcessor = new InputAdapter() {
 
 		@Override
 		public boolean keyDown(final int keycode) {
 			if (keycode == Keys.M) {
-				toggleMusic();
+				toggleBackgroundMusic();
 				return true;
 			}
 			return super.keyDown(keycode);
@@ -95,32 +95,34 @@ public class GameScreen implements Screen {
 
 	};
 
-	private int _textLine;
 	private Texture _bulletImage;
 	private Texture _tankImage;
 	private Texture _turretImage;
 	private Sound _shotSound;
-	private Music _music;
-	private OrthographicCamera _camera;
 
-	public GameScreen(final Tanks pGame) {
-		_game = pGame;
+	private long _lastShotTimeMillis;
+
+	public GameScreen(final MainMenuScreen pMainMenuScreen) {
+		super(pMainMenuScreen);
+
+		_mainMenuScreen = pMainMenuScreen;
 
 		_bulletImage = new Texture(Gdx.files.internal("Bullet.png"), true);
-		_bulletImage.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
+		_bulletImage.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
 		_tankImage = new Texture(Gdx.files.internal("Tank.png"), true);
-		_tankImage.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
+		_tankImage.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
 		_turretImage = new Texture(Gdx.files.internal("GunTurret.png"), true);
-		_turretImage.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
+		_turretImage.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
 
 		_shotSound = Gdx.audio.newSound(Gdx.files.internal("Shot.wav"));
-		_music = Gdx.audio.newMusic(Gdx.files.internal("Music.mp3"));
-		_music.setLooping(true);
-
-		_camera = new OrthographicCamera();
-		_camera.setToOrtho(false, VIEWPORT_W, VIEWPORT_H);
 
 		_state = new State();
+
+		setBackgroundColor(new Color(0.4f, 0.4f, 0.1f, 1.0f));
+		setBackgroundMusic("Music.mp3");
+		setTextMargin(10.0f);
+
+		addInputProcessor(_toggleBackgroundMusicInputProcessor);
 
 		try {
 			_channel = new JChannel();
@@ -162,64 +164,67 @@ public class GameScreen implements Screen {
 					members.forEach(pAddress -> _channelMembers.computeIfAbsent(pAddress, pUnused -> new HashSet<>()));
 				}
 			});
-			_channel.connect(_game._roomName);
+			_channel.connect(_mainMenuScreen.getRoomName());
 			_channel.getState(null, 0);
 		} catch (Exception pE) {
 			throw new RuntimeException(pE);
 		}
 
-		_localTank = new Tank(_game._playerName, TANK_W, TANK_H, VIEWPORT_W / 2, TANK_H);
+		_localTank = new Tank(_mainMenuScreen.getPlayerName(), TANK_W, TANK_H, MathUtils.random() * VIEWPORT_W,
+							  MathUtils.random() * VIEWPORT_H, MathUtils.random() * MathUtils.PI2
+		);
 		_state._tanks.put(_localTank.getUuid(), _localTank);
 		networkSend(_localTank);
 	}
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		Gdx.input.setInputProcessor(null);
 		_channel.close();
 		_bulletImage.dispose();
 		_tankImage.dispose();
 		_shotSound.dispose();
-		_music.dispose();
 	}
 
 	@Override
-	public void hide() {
-	}
+	protected void renderInternal(final float pDelta) {
+		final float delta = 100 * pDelta;
 
-	@Override
-	public void pause() {
-	}
-
-	@Override
-	public void render(final float pDelta) {
 		paintFrame();
-
-		final float change = 100 * Gdx.graphics.getDeltaTime();
 
 		final UpdateMsg updateMsg = new UpdateMsg();
 
 		final TankState oldTankState = _localTank.getState();
 		final TankState newTankState = oldTankState.clone();
 
-		boolean tankDirty = processUserInput(newTankState, change);
+		boolean tankDirty = processUserInput(newTankState, delta);
 
 		final int tankDamageIncrement = _tankDamageIncrement.getAndSet(0);
-		if (tankDamageIncrement > 0) {
+		if (tankDamageIncrement > 0 && newTankState._respawnAtMillis == null) {
 			tankDirty = true;
 			newTankState._damage += tankDamageIncrement;
+			if (newTankState._damage > MAX_DAMAGE) {
+				newTankState._respawnAtMillis = getTimeMillis() + RESPAWN_TIME_MILLIS;
+			}
+		}
+		if (newTankState._respawnAtMillis != null && newTankState._respawnAtMillis < getTimeMillis()) {
+			tankDirty = true;
+			newTankState._damage = 0;
+			newTankState._respawnAtMillis = null;
+			newTankState._centerX = MathUtils.random() * VIEWPORT_W;
+			newTankState._centerY = MathUtils.random() * VIEWPORT_H;
+			newTankState._rotation = MathUtils.random() * MathUtils.PI2;
 		}
 
-		final Iterator<Bullet> bulletI = _state._bullets.values().iterator();
-		while (bulletI.hasNext()) {
-			final Bullet bullet = bulletI.next();
+		for (final Bullet bullet : _state._bullets.values()) {
 			if (!_localTank.isMyBullet(bullet)) {
 				continue;
 			}
 
 			final BulletState oldBulletState = bullet.getState();
 			final BulletState newBulletState = oldBulletState.clone();
-			bullet.move(change * 2, newBulletState);
+			bullet.move(delta * 2, newBulletState);
 
 			boolean removeBullet = false;
 
@@ -255,29 +260,27 @@ public class GameScreen implements Screen {
 		}
 	}
 
-	@Override
-	public void resize(final int pWidth, final int pHeight) {
-	}
-
-	@Override
-	public void resume() {
-	}
-
-	@Override
-	public void show() {
-		Gdx.input.setInputProcessor(_inputProcessor);
-		_music.play();
-	}
-
-	private void draw(final Texture pTexture, final float pCX, final float pCY, final int pW, final int pH, final float pR) {
-		_game._batch.draw(pTexture, pCX - pW / 2, pCY - pH / 2, pW / 2, pH / 2, pW, pH, 1, 1, pR, 0, 0, pTexture.getWidth(),
-						  pTexture.getHeight(), false, false
-		);
-	}
-
-	private void drawText(final String pText) {
-		_game._font.draw(_game._batch, pText, TEXT_MARGIN, VIEWPORT_H - TEXT_MARGIN - _textLine * TEXT_LINE_H);
-		_textLine++;
+	private TankState drawTankStatusText(final Tank pTank, final boolean pDamage) {
+		final TankState state = pTank.getState();
+		final StringBuilder sb = new StringBuilder();
+		sb.append(pTank.getName());
+		sb.append(": ");
+		if (pDamage) {
+			final int health = Math.max(0, MAX_DAMAGE - state._damage);
+			final int damage = MAX_DAMAGE - health;
+			sb.append(Util.repeat("X", damage));
+			sb.append(Util.repeat("O", health));
+		} else {
+			sb.append(state._points);
+		}
+		if (state._respawnAtMillis != null) {
+			sb.append(" (respawn in ");
+			sb.append((Math.max(0, state._respawnAtMillis - getTimeMillis())) / 1000);
+			sb.append("s)");
+		}
+		drawText(sb.toString());
+		drawText("");
+		return state;
 	}
 
 	private void networkReceive(final Object pReceived, final Address pMember) {
@@ -319,32 +322,19 @@ public class GameScreen implements Screen {
 	}
 
 	private void paintFrame() {
-		Gdx.gl.glClearColor(0.4f, 0.4f, 0.1f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		_camera.update();
-		_game._batch.setProjectionMatrix(_camera.combined);
-		_game._batch.begin();
-
-		_textLine = 0;
-
-		drawText(_localTank.getName());
-
-		final TankState localTankState = _localTank.getState();
-		drawText("Points: " + localTankState._points);
-		drawText("Damage: " + localTankState._damage);
+		drawTankStatusText(_localTank, true);
 
 		for (final Bullet bullet : _state._bullets.values()) {
 			final BulletState state = bullet.getState();
-			draw(_bulletImage, state._centerX, state._centerY, BULLET_W, BULLET_H, state._rotation);
+			drawTexture(_bulletImage, state._centerX, state._centerY, BULLET_W, BULLET_H, state._rotation);
 		}
 		for (final Tank tank : _state._tanks.values()) {
-			final TankState state = tank.getState();
-			draw(_tankImage, state._centerX, state._centerY, TANK_W, TANK_H, state._rotation);
-			draw(_turretImage, state._centerX, state._centerY, TURRET_W, TURRET_H, state._rotation + state._turretRotation);
+			final TankState state = drawTankStatusText(tank, false);
+			if (state._respawnAtMillis == null) {
+				drawTexture(_tankImage, state._centerX, state._centerY, TANK_W, TANK_H, state._rotation);
+				drawTexture(_turretImage, state._centerX, state._centerY, TURRET_W, TURRET_H, state._rotation + state._turretRotation);
+			}
 		}
-
-		_game._batch.end();
 	}
 
 	private boolean processUserInput(final TankState pNewState, final float pChange) {
@@ -353,13 +343,6 @@ public class GameScreen implements Screen {
 		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
 			Gdx.app.exit();
 		}
-		if (Gdx.input.isTouched()) {
-			final Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			_camera.unproject(touchPos);
-			//_tank.setCenterIfInRectangle(touchPos.x, _tank.getCenterY(), VIEWPORT_R);
-		}
-
 		if (Gdx.input.isKeyPressed(Keys.W)) {
 			_localTank.move(pChange, pNewState);
 			tankDirty = true;
@@ -398,9 +381,9 @@ public class GameScreen implements Screen {
 		}
 
 		if (Gdx.input.isKeyPressed(Keys.SPACE)) {
-			final long nanoTime = TimeUtils.nanoTime();
-			if (nanoTime - _localTank.getLastShotTime() > 1000000000) {
-				_localTank.setLastShotTime(nanoTime);
+			final long timeMillis = getTimeMillis();
+			if (pNewState._respawnAtMillis == null && timeMillis - _lastShotTimeMillis > TIME_MILLIS_BETWEEN_SHOTS) {
+				_lastShotTimeMillis = timeMillis;
 				spawnBullet(_localTank);
 			}
 		}
@@ -414,14 +397,6 @@ public class GameScreen implements Screen {
 		final Bullet bullet = new Bullet(pTank.getUuid(), state._centerX, state._centerY, state._rotation + state._turretRotation);
 		_state._bullets.put(bullet.getUuid(), bullet);
 		networkSend(bullet);
-	}
-
-	private void toggleMusic() {
-		if (_music.isPlaying()) {
-			_music.stop();
-		} else {
-			_music.play();
-		}
 	}
 
 }

@@ -25,7 +25,6 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<groupId>de.hasait.tanks</groupId>
 	<artifactId>tanks.app.pc</artifactId>
 	<packaging>jar</packaging>
 

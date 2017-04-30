@@ -32,8 +32,6 @@ public class Tank extends AbstractObject<TankState> {
 	private final float _height;
 	private final AtomicReference<Polygon> _boundsHolder = new AtomicReference<>();
 
-	private long _lastShotTime;
-
 
 	public Tank(final String pName, final float pWidth, final float pHeight, final TankState pState) {
 		super();
@@ -44,7 +42,7 @@ public class Tank extends AbstractObject<TankState> {
 		apply(pState);
 	}
 
-	public Tank(final String pName, final float pWidth, final float pHeight, final float pCenterX, final float pCenterY) {
+	public Tank(final String pName, final float pWidth, final float pHeight, final float pCenterX, final float pCenterY, final float pRotation) {
 		super();
 
 		_name = pName;
@@ -55,6 +53,7 @@ public class Tank extends AbstractObject<TankState> {
 		state._uuid = UUID.randomUUID().toString();
 		state._centerX = pCenterX;
 		state._centerY = pCenterY;
+		state._rotation = pRotation;
 		apply(state);
 	}
 
@@ -62,9 +61,6 @@ public class Tank extends AbstractObject<TankState> {
 		return _boundsHolder.get().contains(pX, pY);
 	}
 
-	public long getLastShotTime() {
-		return _lastShotTime;
-	}
 
 	public String getName() {
 		return _name;
@@ -72,11 +68,6 @@ public class Tank extends AbstractObject<TankState> {
 
 	public boolean isMyBullet(final Bullet pBullet) {
 		return getUuid().equals(pBullet.getTankUuid());
-	}
-
-
-	public void setLastShotTime(final long pLastShotTime) {
-		_lastShotTime = pLastShotTime;
 	}
 
 	public void setTurretRotation(final float pTurretRotation) {

@@ -26,4 +26,6 @@ public class TankState extends AbstractState<TankState> {
 	public int _points;
 	public int _damage;
 
+	public Long _respawnAtMillis;
+
 }

@@ -17,7 +17,6 @@
 package de.hasait.tanks.app.common.model;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  *

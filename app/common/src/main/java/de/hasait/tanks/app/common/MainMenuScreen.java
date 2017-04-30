@@ -16,71 +16,80 @@
 
 package de.hasait.tanks.app.common;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+
+import de.hasait.tanks.util.common.Abstract2DScreen;
+import de.hasait.tanks.util.common.Util;
 
 /**
  *
  */
-public class MainMenuScreen implements Screen {
+public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
-	private final Tanks _game;
 
-	private OrthographicCamera _camera;
+	private final TextField _playerNameField;
+	private final TextField _roomNameField;
+	private final TextButton _connectButton;
+	private String _playerName;
+	private String _roomName;
+	private boolean _connect;
 
-	public MainMenuScreen(final Tanks pGame) {
-		_game = pGame;
+	public MainMenuScreen(final TanksScreenContext pContext) {
+		super(pContext);
 
-		_camera = new OrthographicCamera();
-		_camera.setToOrtho(false, 800, 480);
+		setBackgroundColor(new Color(0.0f, 0.0f, 0.2f, 1.0f));
+
+		final Label titleLabel = createLabel("Welcome to Tanks", 2.0f);
+		_playerNameField = createTextField("Player1");
+		_roomNameField = createTextField("Room1");
+		_connectButton = createTextButton("Connect");
+
+		final Table layout = addLayout();
+		layout.setFillParent(true);
+		layout.defaults().pad(5.0f);
+
+		layout.add(titleLabel).colspan(2).padBottom(20.0f);
+		layout.row();
+		layout.add(createLabel("Name"));
+		layout.add(_playerNameField);
+		layout.row();
+		layout.add(createLabel("Room"));
+		layout.add(_roomNameField);
+		layout.row();
+		layout.add(_connectButton).colspan(2);
+
+		_connectButton.addListener(pEvent -> {
+			if (pEvent instanceof ChangeListener.ChangeEvent) {
+				_connect = true;
+			}
+			return false;
+		});
+	}
+
+	public String getPlayerName() {
+		return _playerName;
+	}
+
+	public String getRoomName() {
+		return _roomName;
 	}
 
 	@Override
-	public void dispose() {
-	}
-
-	@Override
-	public void hide() {
-	}
-
-	@Override
-	public void pause() {
-	}
-
-	@Override
-	public void render(final float pDelta) {
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		_camera.update();
-		_game._batch.setProjectionMatrix(_camera.combined);
-
-		_game._batch.begin();
-		_game._font.draw(_game._batch, "Welcome to Tanks", 300, 250);
-		_game._font.draw(_game._batch, "Tap anywhere to begin!", 290, 200);
-		_game._batch.end();
-
-		if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.ENTER)) {
-			_game._playerName = "Player";
-			_game._roomName = "Room1";
-			_game.setScreen(new GameScreen(_game));
-			dispose();
+	protected void renderInternal(final float pDelta) {
+		if (_connect) {
+			_connect = false;
+			_playerName = _playerNameField.getText();
+			_roomName = _roomNameField.getText();
+			if (!Util.isBlank(_playerName) && !Util.isBlank(_roomName)) {
+				setScreen(new GameScreen(this));
+			}
 		}
-	}
-
-	@Override
-	public void resize(final int pWidth, final int pHeight) {
-	}
-
-	@Override
-	public void resume() {
-	}
-
-	@Override
-	public void show() {
 	}
 
 }

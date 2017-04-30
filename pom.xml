@@ -62,6 +62,7 @@
 
 	<modules>
 		<module>app</module>
+		<module>util</module>
 	</modules>
 
 	<dependencyManagement>
@@ -151,6 +152,11 @@
 				<groupId>org.jgroups</groupId>
 				<artifactId>jgroups</artifactId>
 				<version>4.0.2.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>de.hasait.tanks</groupId>
+				<artifactId>tanks.util.common</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>de.hasait.tanks</groupId>

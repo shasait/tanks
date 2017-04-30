@@ -16,16 +16,16 @@
 
 package de.hasait.tanks.app.common;
 
-
+import de.hasait.tanks.util.common.AbstractScreenContext;
 import de.hasait.tanks.util.common.Game;
 
 /**
  *
  */
-public class Tanks extends Game<TanksScreenContext> {
+public class TanksScreenContext extends AbstractScreenContext {
 
-	public Tanks() {
-		super(TanksScreenContext::new, MainMenuScreen::new);
+	public TanksScreenContext(Game<TanksScreenContext> pGame) {
+		super(pGame, 1280, 720);
 	}
 
 }
