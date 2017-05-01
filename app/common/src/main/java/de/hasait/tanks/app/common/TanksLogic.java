@@ -181,7 +181,7 @@ public class TanksLogic implements Disposable {
 		if (tankDamageIncrement > 0 && newTankState._respawnAtMillis == null) {
 			pUpdateContext._tankDirty = true;
 			newTankState._damage += tankDamageIncrement;
-			if (newTankState._damage > _state._rules._maxDamage) {
+			if (newTankState._damage >= _state._rules._maxDamage) {
 				newTankState._respawnAtMillis = pUpdateContext._timeMillis + _state._rules._respawnTimeMillis;
 			}
 		}
