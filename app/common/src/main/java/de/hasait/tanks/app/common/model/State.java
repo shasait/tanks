@@ -26,8 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class State implements Serializable {
 
 	public final Map<String, Tank> _tanks = new ConcurrentHashMap<>();
-
 	public final Map<String, Bullet> _bullets = new ConcurrentHashMap<>();
+
+	public final Rules _rules = new Rules();
 
 	public void apply(final TankState pTankState) {
 		final Tank tank = _tanks.get(pTankState._uuid);

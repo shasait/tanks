@@ -33,10 +33,12 @@ import de.hasait.tanks.util.common.Util;
 public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 
-	private final TextField _playerNameField;
+	private final TextField _player1NameField;
+	private final TextField _player2NameField;
 	private final TextField _roomNameField;
 	private final TextButton _connectButton;
-	private String _playerName;
+	private String _player1Name;
+	private String _player2Name;
 	private String _roomName;
 	private boolean _connect;
 
@@ -46,7 +48,8 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		setBackgroundColor(new Color(0.0f, 0.0f, 0.2f, 1.0f));
 
 		final Label titleLabel = createLabel("Welcome to Tanks", 2.0f);
-		_playerNameField = createTextField("Player1");
+		_player1NameField = createTextField("Player1");
+		_player2NameField = createTextField("");
 		_roomNameField = createTextField("Room1");
 		_connectButton = createTextButton("Connect");
 
@@ -56,11 +59,14 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		layout.add(titleLabel).colspan(2).padBottom(20.0f);
 		layout.row();
-		layout.add(createLabel("Name"));
-		layout.add(_playerNameField);
+		layout.add(createLabel("Player 1"));
+		layout.add(_player1NameField);
 		layout.row();
 		layout.add(createLabel("Room"));
 		layout.add(_roomNameField);
+		layout.row();
+		layout.add(createLabel("Player 2"));
+		layout.add(_player2NameField);
 		layout.row();
 		layout.add(_connectButton).colspan(2);
 
@@ -72,8 +78,12 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		});
 	}
 
-	public String getPlayerName() {
-		return _playerName;
+	public String getPlayer1Name() {
+		return _player1Name;
+	}
+
+	public String getPlayer2Name() {
+		return _player2Name;
 	}
 
 	public String getRoomName() {
@@ -84,9 +94,11 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 	protected void renderInternal(final float pDelta) {
 		if (_connect) {
 			_connect = false;
-			_playerName = _playerNameField.getText();
+			_player1Name = _player1NameField.getText();
+			_player2Name = _player2NameField.getText();
+			_player2Name = Util.isBlank(_player2Name) ? null : _player2Name;
 			_roomName = _roomNameField.getText();
-			if (!Util.isBlank(_playerName) && !Util.isBlank(_roomName)) {
+			if (!Util.isBlank(_player1Name) && !Util.isBlank(_roomName)) {
 				setScreen(new GameScreen(this));
 			}
 		}

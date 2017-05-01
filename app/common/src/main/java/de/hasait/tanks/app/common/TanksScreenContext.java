@@ -24,8 +24,52 @@ import de.hasait.tanks.util.common.Game;
  */
 public class TanksScreenContext extends AbstractScreenContext {
 
+	private final int _tankW, _tankH;
+	private final int _turretW, _turretH;
+	private final int _bulletW, _bulletH;
+	private final float _tankSpeed = 100.0f;
+	private final float _bulletSpeed = _tankSpeed * 2.0f;
+
 	public TanksScreenContext(Game<TanksScreenContext> pGame) {
 		super(pGame, 1280, 720);
+		_tankW = 32;
+		_tankH = _tankW;
+		_turretW = _tankW / 2;
+		_turretH = _tankH * 3 / 4;
+		_bulletW = _tankW / 4;
+		_bulletH = _tankH / 3;
+	}
+
+	public int getBulletH() {
+		return _bulletH;
+	}
+
+	public float getBulletSpeed() {
+		return _bulletSpeed;
+	}
+
+	public int getBulletW() {
+		return _bulletW;
+	}
+
+	public int getTankH() {
+		return _tankH;
+	}
+
+	public float getTankSpeed() {
+		return _tankSpeed;
+	}
+
+	public int getTankW() {
+		return _tankW;
+	}
+
+	public int getTurretH() {
+		return _turretH;
+	}
+
+	public int getTurretW() {
+		return _turretW;
 	}
 
 }

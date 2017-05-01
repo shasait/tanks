@@ -47,10 +47,6 @@ public abstract class AbstractScreenContext implements Disposable {
 		_font = new BitmapFont();
 	}
 
-	public final boolean contains(final float pX, final float pY) {
-		return _viewportR.contains(pX, pY);
-	}
-
 	@Override
 	public void dispose() {
 		_font.dispose();
@@ -63,6 +59,10 @@ public abstract class AbstractScreenContext implements Disposable {
 
 	public final int getViewportW() {
 		return _viewportW;
+	}
+
+	public final boolean viewportContains(final float pX, final float pY) {
+		return _viewportR.contains(pX, pY);
 	}
 
 	SpriteBatch getBatch() {

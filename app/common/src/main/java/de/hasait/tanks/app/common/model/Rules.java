@@ -16,22 +16,16 @@
 
 package de.hasait.tanks.app.common.model;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
  */
-public class SerializableTank implements Serializable {
+public class Rules implements Serializable {
 
-	public String _ownerAddress;
-	public String _name;
-	public float _width;
-	public float _height;
-	public TankState _state;
-
-	private Object readResolve() throws ObjectStreamException {
-		return new Tank(_ownerAddress, _name, _width, _height, _state);
-	}
+	public int _maxDamage = 5;
+	public long _respawnTimeMillis = TimeUnit.SECONDS.toMillis(10);
+	public long _timeMillisBetweenShots = 1000;
 
 }

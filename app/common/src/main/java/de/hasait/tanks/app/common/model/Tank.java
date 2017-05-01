@@ -33,8 +33,8 @@ public class Tank extends AbstractObject<TankState> {
 	private final AtomicReference<Polygon> _boundsHolder = new AtomicReference<>();
 
 
-	public Tank(final String pName, final float pWidth, final float pHeight, final TankState pState) {
-		super();
+	public Tank(final String pOwnerAddress, final String pName, final float pWidth, final float pHeight, final TankState pState) {
+		super(pOwnerAddress);
 
 		_name = pName;
 		_width = pWidth;
@@ -42,8 +42,8 @@ public class Tank extends AbstractObject<TankState> {
 		apply(pState);
 	}
 
-	public Tank(final String pName, final float pWidth, final float pHeight, final float pCenterX, final float pCenterY, final float pRotation) {
-		super();
+	public Tank(final String pOwnerAddress, final String pName, final float pWidth, final float pHeight, final long pSpawnAtMillis) {
+		super(pOwnerAddress);
 
 		_name = pName;
 		_width = pWidth;
@@ -51,9 +51,7 @@ public class Tank extends AbstractObject<TankState> {
 
 		final TankState state = new TankState();
 		state._uuid = UUID.randomUUID().toString();
-		state._centerX = pCenterX;
-		state._centerY = pCenterY;
-		state._rotation = pRotation;
+		state._respawnAtMillis = pSpawnAtMillis;
 		apply(state);
 	}
 
@@ -105,6 +103,7 @@ public class Tank extends AbstractObject<TankState> {
 
 	private Object writeReplace() throws ObjectStreamException {
 		final SerializableTank serializable = new SerializableTank();
+		serializable._ownerAddress = getOwnerAddress();
 		serializable._name = _name;
 		serializable._width = _width;
 		serializable._height = _height;

@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package de.hasait.tanks.app.common.model;
-
-import java.io.ObjectStreamException;
-import java.io.Serializable;
+package de.hasait.tanks.app.common;
 
 /**
  *
  */
-public class SerializableTank implements Serializable {
+public class TankActions {
 
-	public String _ownerAddress;
-	public String _name;
-	public float _width;
-	public float _height;
-	public TankState _state;
-
-	private Object readResolve() throws ObjectStreamException {
-		return new Tank(_ownerAddress, _name, _width, _height, _state);
-	}
+	public boolean _moveForward, _moveBackward;
+	public boolean _rotateLeft, _rotateRight;
+	public boolean _turrentRotateLeft, _turrentRotateRight;
+	public boolean _fire;
 
 }

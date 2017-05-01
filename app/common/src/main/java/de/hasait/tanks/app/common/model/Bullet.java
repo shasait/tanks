@@ -26,15 +26,15 @@ public class Bullet extends AbstractObject<BulletState> {
 
 	private final String _tankUuid;
 
-	public Bullet(final String pTankUuid, final BulletState pState) {
-		super();
+	public Bullet(final String pOwnerAddress, final String pTankUuid, final BulletState pState) {
+		super(pOwnerAddress);
 
 		_tankUuid = pTankUuid;
 		apply(pState);
 	}
 
-	public Bullet(final String pTankUuid, final float pCenterX, final float pCenterY, final float pRotation) {
-		super();
+	public Bullet(final String pOwnerAddress, final String pTankUuid, final float pCenterX, final float pCenterY, final float pRotation) {
+		super(pOwnerAddress);
 
 		_tankUuid = pTankUuid;
 
@@ -53,6 +53,7 @@ public class Bullet extends AbstractObject<BulletState> {
 
 	private Object writeReplace() throws ObjectStreamException {
 		final SerializableBullet serializable = new SerializableBullet();
+		serializable._ownerAddress = getOwnerAddress();
 		serializable._tankUuid = _tankUuid;
 		serializable._state = getState();
 		return serializable;

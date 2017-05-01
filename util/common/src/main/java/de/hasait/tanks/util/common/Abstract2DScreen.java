@@ -69,10 +69,6 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 	private Skin _skin;
 	private long _timeMillis;
 
-	protected Abstract2DScreen(final Abstract2DScreen<C> pScreen) {
-		this(pScreen._context);
-	}
-
 	protected Abstract2DScreen(final C pContext) {
 		super();
 
@@ -93,6 +89,10 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 	public void dispose() {
 		_disposables.forEach(Disposable::dispose);
 		_disposables.clear();
+	}
+
+	public final C getContext() {
+		return _context;
 	}
 
 	@Override

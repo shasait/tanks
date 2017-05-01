@@ -24,11 +24,12 @@ import java.io.Serializable;
  */
 public class SerializableBullet implements Serializable {
 
+	public String _ownerAddress;
 	public String _tankUuid;
 	public BulletState _state;
 
 	private Object readResolve() throws ObjectStreamException {
-		return new Bullet(_tankUuid, _state);
+		return new Bullet(_ownerAddress, _tankUuid, _state);
 	}
 
 }

@@ -29,14 +29,24 @@ import com.badlogic.gdx.math.Vector2;
  */
 public abstract class AbstractObject<S extends AbstractState<S>> implements Serializable {
 
+	private final String _ownerAddress;
+
 	private final AtomicReference<S> _stateHolder = new AtomicReference<>();
 	private final AtomicReference<Vector2> _moveVectorHolder = new AtomicReference<>();
+
+	protected AbstractObject(final String pOwnerAddress) {
+		_ownerAddress = pOwnerAddress;
+	}
 
 	public final void apply(final S pNewState) {
 		Objects.requireNonNull(pNewState);
 
 		final S oldState = _stateHolder.getAndSet(pNewState);
 		afterStateChange(oldState, pNewState);
+	}
+
+	public final String getOwnerAddress() {
+		return _ownerAddress;
 	}
 
 	public final Vector2 getMoveVector() {
