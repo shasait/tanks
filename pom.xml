@@ -53,6 +53,17 @@
 		</repository>
 	</distributionManagement>
 
+	<developers>
+		<developer>
+			<name>Sebastian Hasait</name>
+			<id>shasait</id>
+			<email>sebastian@hasait.de</email>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+	</developers>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -383,4 +394,3 @@
 		</plugins>
 	</build>
 </project>
-
