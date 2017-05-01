@@ -18,7 +18,7 @@
 
 	<groupId>de.hasait.tanks</groupId>
 	<artifactId>tanks.aggregator</artifactId>
-	<version>0.0.1.RC2</version>
+	<version>0.0.1.RC3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Tanks Game Aggregator</name>
