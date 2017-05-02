@@ -86,16 +86,16 @@ public class TanksLogic implements Disposable {
 				@Override
 				public void receive(final Message pMessage) {
 					final Object received = pMessage.getObject();
-					networkReceive(received, pMessage.getSrc());
+					networkReceive(received);
 				}
 
 				@Override
 				public void setState(final InputStream pInput) throws Exception {
 					try (final ObjectInputStream ois = new ObjectInputStream(pInput)) {
 						final State state = (State) ois.readObject();
-						_state._tanks.putAll(state._tanks);
-						_state._bullets.putAll(state._bullets);
-						_state._rules.set(state._rules.get());
+						state._tanks.values().forEach(TanksLogic.this::networkReceive);
+						state._bullets.values().forEach(TanksLogic.this::networkReceive);
+						networkReceive(state._rules.get());
 					}
 				}
 
@@ -202,7 +202,7 @@ public class TanksLogic implements Disposable {
 		}
 	}
 
-	private void networkReceive(final Object pReceived, final Address pMember) {
+	private void networkReceive(final Object pReceived) {
 		if (pReceived instanceof UpdateMsg) {
 			final UpdateMsg dirty = (UpdateMsg) pReceived;
 			for (final TankState tankState : dirty._tanks) {
@@ -228,6 +228,10 @@ public class TanksLogic implements Disposable {
 		if (pReceived instanceof Bullet) {
 			final Bullet bullet = (Bullet) pReceived;
 			_state._bullets.putIfAbsent(bullet.getUuid(), bullet);
+		}
+		if (pReceived instanceof Rules) {
+			final Rules rules = (Rules) pReceived;
+			_state._rules.set(rules);
 		}
 	}
 
@@ -298,12 +302,16 @@ public class TanksLogic implements Disposable {
 		localTank._tankActionsFiller.accept(tankActions);
 
 
-		if (tankActions._moveForward && !tankActions._moveBackward) {
-			localTank._tank.move(speed, newTankState);
-			pUpdateContext._tankDirty = true;
+		float moveSpeed = 0.0f;
+		if (tankActions._moveForward) {
+			moveSpeed += speed;
 		}
-		if (tankActions._moveBackward && !tankActions._moveForward) {
-			localTank._tank.move(-speed, newTankState);
+		if (tankActions._moveBackward) {
+			moveSpeed -= speed;
+		}
+		if (moveSpeed != 0.0f) {
+
+			localTank._tank.move(moveSpeed, newTankState);
 			pUpdateContext._tankDirty = true;
 		}
 		if (newTankState._centerX < 0) {
