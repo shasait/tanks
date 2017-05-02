@@ -20,16 +20,26 @@ import java.io.ObjectStreamException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  *
  */
 public class Tank extends AbstractObject<TankState> {
 
+	private static TankState createState(final long pSpawnAtMillis) {
+		final TankState state = new TankState();
+		state._uuid = UUID.randomUUID().toString();
+		state._respawnAtMillis = pSpawnAtMillis;
+		return state;
+	}
+
 	private final String _name;
 	private final float _width;
 	private final float _height;
+	private final float _whDist2;
 	private final AtomicReference<Polygon> _boundsHolder = new AtomicReference<>();
 
 
@@ -39,29 +49,50 @@ public class Tank extends AbstractObject<TankState> {
 		_name = pName;
 		_width = pWidth;
 		_height = pHeight;
+		_whDist2 = (float) Math.sqrt(_width * _width + _height * _height) / 2.0f;
+
 		apply(pState);
 	}
 
 	public Tank(final String pOwnerAddress, final String pName, final float pWidth, final float pHeight, final long pSpawnAtMillis) {
-		super(pOwnerAddress);
-
-		_name = pName;
-		_width = pWidth;
-		_height = pHeight;
-
-		final TankState state = new TankState();
-		state._uuid = UUID.randomUUID().toString();
-		state._respawnAtMillis = pSpawnAtMillis;
-		apply(state);
+		this(pOwnerAddress, pName, pWidth, pHeight, createState(pSpawnAtMillis));
 	}
 
 	public boolean contains(final float pX, final float pY) {
 		return _boundsHolder.get().contains(pX, pY);
 	}
 
-
 	public String getName() {
 		return _name;
+	}
+
+	/**
+	 * @return distance if intersecting; otherwise null.
+	 */
+	public Float intersects(final Tank pTank) {
+		if (pTank == null) {
+			return null;
+		}
+		if (getUuid().equals(pTank.getUuid())) {
+			return null;
+		}
+
+		final TankState state1 = getState();
+		final TankState state2 = pTank.getState();
+
+		final float dst = Vector2.dst(state1._centerX, state1._centerY, state2._centerX, state2._centerY);
+		if (dst > _whDist2 + pTank._whDist2) {
+			return null;
+		}
+
+		final Polygon p1 = _boundsHolder.get();
+		final Polygon p2 = pTank._boundsHolder.get();
+
+		if (Intersector.intersectPolygons(_boundsHolder.get(), pTank._boundsHolder.get(), new Polygon())) {
+			return dst;
+		}
+
+		return null;
 	}
 
 	public boolean isMyBullet(final Bullet pBullet) {

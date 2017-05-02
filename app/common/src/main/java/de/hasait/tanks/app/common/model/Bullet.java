@@ -24,26 +24,27 @@ import java.util.UUID;
  */
 public class Bullet extends AbstractObject<BulletState> {
 
+	private static BulletState createState(final float pCenterX, final float pCenterY, final float pRotation) {
+		final BulletState state = new BulletState();
+		state._uuid = UUID.randomUUID().toString();
+		state._centerX = pCenterX;
+		state._centerY = pCenterY;
+		state._rotation = pRotation;
+		return state;
+	}
+
 	private final String _tankUuid;
 
 	public Bullet(final String pOwnerAddress, final String pTankUuid, final BulletState pState) {
 		super(pOwnerAddress);
 
 		_tankUuid = pTankUuid;
+
 		apply(pState);
 	}
 
 	public Bullet(final String pOwnerAddress, final String pTankUuid, final float pCenterX, final float pCenterY, final float pRotation) {
-		super(pOwnerAddress);
-
-		_tankUuid = pTankUuid;
-
-		final BulletState state = new BulletState();
-		state._uuid = UUID.randomUUID().toString();
-		state._centerX = pCenterX;
-		state._centerY = pCenterY;
-		state._rotation = pRotation;
-		apply(state);
+		this(pOwnerAddress, pTankUuid, createState(pCenterX, pCenterY, pRotation));
 	}
 
 	public String getTankUuid() {
