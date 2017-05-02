@@ -19,6 +19,7 @@ package de.hasait.tanks.app.common.model;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  *
@@ -28,7 +29,7 @@ public class State implements Serializable {
 	public final Map<String, Tank> _tanks = new ConcurrentHashMap<>();
 	public final Map<String, Bullet> _bullets = new ConcurrentHashMap<>();
 
-	public final Rules _rules = new Rules();
+	public final AtomicReference<Rules> _rules = new AtomicReference<>(new Rules());
 
 	public void apply(final TankState pTankState) {
 		final Tank tank = _tanks.get(pTankState._uuid);

@@ -95,6 +95,7 @@ public class TanksLogic implements Disposable {
 						final State state = (State) ois.readObject();
 						_state._tanks.putAll(state._tanks);
 						_state._bullets.putAll(state._bullets);
+						_state._rules.set(state._rules.get());
 					}
 				}
 
@@ -135,7 +136,7 @@ public class TanksLogic implements Disposable {
 	}
 
 	public Rules getRules() {
-		return _state._rules;
+		return _state._rules.get();
 	}
 
 	public Collection<Tank> getTanks() {
@@ -144,7 +145,7 @@ public class TanksLogic implements Disposable {
 
 	public void spawnTank(final String pPlayerName, final Consumer<TankActions> pTankActionsFiller) {
 		final Tank tank = new Tank(_channel.getAddressAsString(), pPlayerName, _context.getTankW(), _context.getTankH(),
-								   TimeUtils.millis() + _state._rules._respawnTimeMillis
+								   TimeUtils.millis() + getRules()._respawnTimeMillis
 		);
 		final LocalTank localTank = new LocalTank(tank, pTankActionsFiller);
 		_localTanks.put(tank.getUuid(), localTank);
@@ -181,8 +182,8 @@ public class TanksLogic implements Disposable {
 		if (tankDamageIncrement > 0 && newTankState._respawnAtMillis == null) {
 			pUpdateContext._tankDirty = true;
 			newTankState._damage += tankDamageIncrement;
-			if (newTankState._damage >= _state._rules._maxDamage) {
-				newTankState._respawnAtMillis = pUpdateContext._timeMillis + _state._rules._respawnTimeMillis;
+			if (newTankState._damage >= getRules()._maxDamage) {
+				newTankState._respawnAtMillis = pUpdateContext._timeMillis + getRules()._respawnTimeMillis;
 			}
 		}
 	}
@@ -336,7 +337,7 @@ public class TanksLogic implements Disposable {
 
 		if (tankActions._fire) {
 			if (newTankState._respawnAtMillis == null
-					&& pUpdateContext._timeMillis - localTank._lastShotTimeMillis > _state._rules._timeMillisBetweenShots) {
+					&& pUpdateContext._timeMillis - localTank._lastShotTimeMillis > getRules()._timeMillisBetweenShots) {
 				localTank._lastShotTimeMillis = pUpdateContext._timeMillis;
 				spawnBullet(localTank._tank);
 				_callback.onSpawnBullet();
