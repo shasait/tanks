@@ -29,7 +29,7 @@ public class Main {
 	public static void main(final String[] pArgs) {
 		final LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 1280;
-		config.height = 720;
+		config.height = 768;
 		config.resizable = true;
 
 		new LwjglApplication(new Tanks(), config);

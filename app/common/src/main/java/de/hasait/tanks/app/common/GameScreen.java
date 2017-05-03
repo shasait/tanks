@@ -17,6 +17,7 @@
 package de.hasait.tanks.app.common;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
@@ -26,6 +27,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 import de.hasait.tanks.app.common.model.Bullet;
 import de.hasait.tanks.app.common.model.BulletState;
+import de.hasait.tanks.app.common.model.DistributedModel;
 import de.hasait.tanks.app.common.model.Tank;
 import de.hasait.tanks.app.common.model.TankState;
 import de.hasait.tanks.util.common.Abstract2DScreen;
@@ -56,6 +58,7 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		}
 	};
 
+	private final DistributedModel _model;
 	private final TanksLogic _tanksLogic;
 
 	private Texture _bulletImage;
@@ -64,8 +67,12 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 	private Sound _shotSound;
 
 
-	public GameScreen(final MainMenuScreen pMainMenuScreen) {
-		super(pMainMenuScreen.getContext());
+	public GameScreen(final TanksScreenContext pContext, final DistributedModel pModel) {
+		super(pContext, pModel.getModel().getWorldW(), pModel.getModel().getWorldH());
+
+		_model = pModel;
+		addDisposable(_model);
+		_tanksLogic = new TanksLogic(_model, _callback);
 
 		_bulletImage = new Texture(Gdx.files.internal("Bullet.png"), true);
 		addDisposable(_bulletImage);
@@ -85,19 +92,16 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		setTextMargin(10.0f);
 
 		addInputProcessor(_toggleBackgroundMusicInputProcessor);
-
-		_tanksLogic = new TanksLogic(pMainMenuScreen.getContext(), pMainMenuScreen.getRoomName(), _callback);
-		addDisposable(_tanksLogic);
-
-		_tanksLogic.spawnTank(pMainMenuScreen.getPlayer1Name(), this::processPlayer1Input);
-		if (pMainMenuScreen.getPlayer2Name() != null) {
-			_tanksLogic.spawnTank(pMainMenuScreen.getPlayer2Name(), this::processPlayer2Input);
-		}
 	}
 
 	@Override
 	protected void renderInternal(final float pDeltaTimeSeconds) {
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
+
 		paintFrame();
+
 		_tanksLogic.update(getTimeMillis(), pDeltaTimeSeconds);
 	}
 
@@ -130,43 +134,21 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		for (final Bullet bullet : _tanksLogic.getBullets()) {
 			final BulletState state = bullet.getState();
-			drawTexture(_bulletImage, state._centerX, state._centerY, getContext().getBulletW(), getContext().getBulletH(),
+			drawTexture(_bulletImage, state._centerX, state._centerY, _model.getModel().getBulletW(), _model.getModel().getBulletH(),
 						state._rotation
 			);
 		}
 		for (final Tank tank : _tanksLogic.getTanks()) {
 			final TankState state = drawTankStatusText(tank, false);
 			if (state._respawnAtMillis == null) {
-				drawTexture(_tankImage, state._centerX, state._centerY, getContext().getTankW(), getContext().getTankH(), state._rotation);
-				drawTexture(_turretImage, state._centerX, state._centerY, getContext().getTurretW(), getContext().getTurretH(),
+				drawTexture(_tankImage, state._centerX, state._centerY, _model.getModel().getTankW(), _model.getModel().getTankH(),
+							state._rotation
+				);
+				drawTexture(_turretImage, state._centerX, state._centerY, _model.getModel().getTurretW(), _model.getModel().getTurretH(),
 							state._rotation + state._turretRotation
 				);
 			}
 		}
-	}
-
-	private void processPlayer1Input(final TankActions pTankActions) {
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
-
-		pTankActions._moveForward = Gdx.input.isKeyPressed(Keys.W);
-		pTankActions._moveBackward = Gdx.input.isKeyPressed(Keys.S);
-		pTankActions._rotateLeft = Gdx.input.isKeyPressed(Keys.A);
-		pTankActions._rotateRight = Gdx.input.isKeyPressed(Keys.D);
-		pTankActions._turrentRotateLeft = Gdx.input.isKeyPressed(Keys.Q);
-		pTankActions._turrentRotateRight = Gdx.input.isKeyPressed(Keys.E);
-		pTankActions._fire = Gdx.input.isKeyPressed(Keys.SPACE);
-	}
-
-	private void processPlayer2Input(final TankActions pTankActions) {
-		pTankActions._moveForward = Gdx.input.isKeyPressed(Keys.NUMPAD_5);
-		pTankActions._moveBackward = Gdx.input.isKeyPressed(Keys.NUMPAD_2);
-		pTankActions._rotateLeft = Gdx.input.isKeyPressed(Keys.NUMPAD_1);
-		pTankActions._rotateRight = Gdx.input.isKeyPressed(Keys.NUMPAD_3);
-		pTankActions._turrentRotateLeft = Gdx.input.isKeyPressed(Keys.NUMPAD_4);
-		pTankActions._turrentRotateRight = Gdx.input.isKeyPressed(Keys.NUMPAD_6);
-		pTankActions._fire = Gdx.input.isKeyPressed(Keys.NUMPAD_0);
 	}
 
 }

@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  *
  */
-public class Bullet extends AbstractObject<BulletState> {
+public class Bullet extends AbstractGameObject<BulletState> {
 
 	private static BulletState createState(final float pCenterX, final float pCenterY, final float pRotation) {
 		final BulletState state = new BulletState();

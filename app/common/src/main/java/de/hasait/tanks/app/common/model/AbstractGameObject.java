@@ -27,14 +27,14 @@ import com.badlogic.gdx.math.Vector2;
 /**
  *
  */
-public abstract class AbstractObject<S extends AbstractState<S>> implements Serializable {
+public abstract class AbstractGameObject<S extends AbstractState<S>> implements Serializable {
 
 	private final String _ownerAddress;
 
 	private final AtomicReference<S> _stateHolder = new AtomicReference<>();
 	private final AtomicReference<Vector2> _moveVectorHolder = new AtomicReference<>();
 
-	protected AbstractObject(final String pOwnerAddress) {
+	protected AbstractGameObject(final String pOwnerAddress) {
 		_ownerAddress = pOwnerAddress;
 	}
 

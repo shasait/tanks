@@ -16,16 +16,24 @@
 
 package de.hasait.tanks.app.common;
 
-import de.hasait.tanks.util.common.AbstractScreenContext;
-import de.hasait.tanks.util.common.Game;
+import com.badlogic.gdx.Gdx;
+
+import de.hasait.tanks.app.common.model.ConfiguredAction;
 
 /**
  *
  */
-public class TanksScreenContext extends AbstractScreenContext {
+public class GdxInputKeyPressedAction implements ConfiguredAction {
 
-	public TanksScreenContext(Game<TanksScreenContext> pGame) {
-		super(pGame);
+	private final int _key;
+
+	public GdxInputKeyPressedAction(final int pKey) {
+		_key = pKey;
+	}
+
+	@Override
+	public boolean isActive() {
+		return Gdx.input.isKeyPressed(_key);
 	}
 
 }

@@ -31,6 +31,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -52,6 +53,10 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 
 	private final C _context;
 
+	private final int _viewportW, _viewportH;
+	private final Rectangle _viewportR;
+
+
 	private final List<Disposable> _disposables = new ArrayList<>();
 
 	private final OrthographicCamera _camera;
@@ -69,19 +74,18 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 	private Skin _skin;
 	private long _timeMillis;
 
-	protected Abstract2DScreen(final C pContext) {
+	protected Abstract2DScreen(final C pContext, final int pViewportW, final int pViewportH) {
 		super();
 
 		_context = pContext;
 
+		_viewportW = pViewportW;
+		_viewportH = pViewportH;
+		_viewportR = new Rectangle(0, 0, _viewportW, _viewportH);
+
 		_camera = new OrthographicCamera();
-		_camera.setToOrtho(false, _context.getViewportW(), _context.getViewportH());
-
 		_backgroundColor = Color.BLACK;
-
-		_stage = new Stage(new ScalingViewport(Scaling.fit, pContext.getViewportW(), pContext.getViewportH(), _camera),
-						   _context.getBatch()
-		);
+		_stage = new Stage(new ScalingViewport(Scaling.fit, _viewportW, _viewportH, _camera), _context.getBatch());
 		_inputMultiplexer.addProcessor(_stage);
 	}
 
@@ -93,6 +97,14 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 
 	public final C getContext() {
 		return _context;
+	}
+
+	public final int getViewportH() {
+		return _viewportH;
+	}
+
+	public final int getViewportW() {
+		return _viewportW;
 	}
 
 	@Override
@@ -149,6 +161,10 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 		}
 	}
 
+	public final boolean viewportContains(final float pX, final float pY) {
+		return _viewportR.contains(pX, pY);
+	}
+
 	protected final void addDisposable(final Disposable pDisposable) {
 		_disposables.add(pDisposable);
 	}
@@ -189,7 +205,7 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 
 	protected final void drawText(final CharSequence pText) {
 		final BitmapFont font = _context.getFont();
-		font.draw(_context.getBatch(), pText, _textMargin, _context.getViewportH() - _textMargin - _textLine * font.getLineHeight());
+		font.draw(_context.getBatch(), pText, _textMargin, _viewportH - _textMargin - _textLine * font.getLineHeight());
 		_textLine++;
 	}
 
@@ -203,9 +219,9 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 
 	protected final void drawText(final int pLine, final CharSequence pText, final AlignH pAlignH, final AlignV pAlignV) {
 		final BitmapFont font = _context.getFont();
-		final float y = pAlignV.getY(_context.getViewportH(), font.getLineHeight(), _textMargin) + pLine * font.getLineHeight();
+		final float y = pAlignV.getY(_viewportH, font.getLineHeight(), _textMargin) + pLine * font.getLineHeight();
 		final int alignH = pAlignH.getAlign();
-		font.draw(_context.getBatch(), pText, _textMargin, y, _context.getViewportW() - 2 * _textMargin, alignH, false);
+		font.draw(_context.getBatch(), pText, _textMargin, y, _viewportW - 2 * _textMargin, alignH, false);
 	}
 
 	protected final void drawTexture(final Texture pTexture, final float pCX, final float pCY, final int pW, final int pH, final float pR) {

@@ -17,6 +17,11 @@
 package de.hasait.tanks.app.common;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -24,6 +29,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
+import de.hasait.tanks.app.common.model.GameConfig;
+import de.hasait.tanks.app.common.model.PlayerConfig;
 import de.hasait.tanks.util.common.Abstract2DScreen;
 import de.hasait.tanks.util.common.Util;
 
@@ -32,25 +39,21 @@ import de.hasait.tanks.util.common.Util;
  */
 public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
-
-	private final TextField _player1NameField;
-	private final TextField _player2NameField;
 	private final TextField _roomNameField;
+	private final List<TextField> _playerNameFields = new ArrayList<>();
 	private final TextButton _connectButton;
-	private String _player1Name;
-	private String _player2Name;
-	private String _roomName;
 	private boolean _connect;
 
 	public MainMenuScreen(final TanksScreenContext pContext) {
-		super(pContext);
+		super(pContext, 800, 600);
 
 		setBackgroundColor(new Color(0.0f, 0.0f, 0.2f, 1.0f));
 
 		final Label titleLabel = createLabel("Welcome to Tanks", 2.0f);
-		_player1NameField = createTextField("Player1");
-		_player2NameField = createTextField("");
-		_roomNameField = createTextField("Room1");
+		_roomNameField = createTextField("Default");
+		for (int i = 0; i < 2; i++) {
+			_playerNameFields.add(createTextField());
+		}
 		_connectButton = createTextButton("Connect");
 
 		final Table layout = addLayout();
@@ -59,15 +62,14 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		layout.add(titleLabel).colspan(2).padBottom(20.0f);
 		layout.row();
-		layout.add(createLabel("Player 1"));
-		layout.add(_player1NameField);
-		layout.row();
 		layout.add(createLabel("Room"));
 		layout.add(_roomNameField);
 		layout.row();
-		layout.add(createLabel("Player 2"));
-		layout.add(_player2NameField);
-		layout.row();
+		for (int i = 0; i < _playerNameFields.size(); i++) {
+			layout.add(createLabel("Player " + (i + 1)));
+			layout.add(_playerNameFields.get(i));
+			layout.row();
+		}
 		layout.add(_connectButton).colspan(2);
 
 		_connectButton.addListener(pEvent -> {
@@ -78,30 +80,64 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		});
 	}
 
-	public String getPlayer1Name() {
-		return _player1Name;
-	}
-
-	public String getPlayer2Name() {
-		return _player2Name;
-	}
-
-	public String getRoomName() {
-		return _roomName;
-	}
-
 	@Override
 	protected void renderInternal(final float pDelta) {
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
+
 		if (_connect) {
 			_connect = false;
-			_player1Name = _player1NameField.getText();
-			_player2Name = _player2NameField.getText();
-			_player2Name = Util.isBlank(_player2Name) ? null : _player2Name;
-			_roomName = _roomNameField.getText();
-			if (!Util.isBlank(_player1Name) && !Util.isBlank(_roomName)) {
-				setScreen(new GameScreen(this));
+
+			final String roomName = _roomNameField.getText();
+			if (Util.isBlank(roomName)) {
+				return;
 			}
+
+			final GameConfig config = new GameConfig(roomName, 40, 24);
+			for (int i = 0; i < _playerNameFields.size(); i++) {
+				final String playerName = _playerNameFields.get(i).getText();
+				if (Util.isBlank(playerName)) {
+					continue;
+				}
+				final PlayerConfig playerConfig = new PlayerConfig(playerName.trim());
+				// TODO make actions configurable
+				if (i == 0) {
+					setActionSet1(playerConfig);
+				}
+				if (i == 1) {
+					setActionSet2(playerConfig);
+				}
+
+				config.getPlayers().add(playerConfig);
+			}
+
+			if (config.getPlayers().isEmpty()) {
+				return;
+			}
+
+			setScreen(new ConnectingScreen(getContext(), config));
 		}
+	}
+
+	private void setActionSet1(final PlayerConfig pPlayerConfig) {
+		pPlayerConfig.setMoveForward(new GdxInputKeyPressedAction(Input.Keys.W));
+		pPlayerConfig.setMoveBackward(new GdxInputKeyPressedAction(Input.Keys.S));
+		pPlayerConfig.setRotateLeft(new GdxInputKeyPressedAction(Input.Keys.A));
+		pPlayerConfig.setRotateRight(new GdxInputKeyPressedAction(Input.Keys.D));
+		pPlayerConfig.setTurrentRotateLeft(new GdxInputKeyPressedAction(Input.Keys.Q));
+		pPlayerConfig.setTurrentRotateRight(new GdxInputKeyPressedAction(Input.Keys.E));
+		pPlayerConfig.setFire(new GdxInputKeyPressedAction(Input.Keys.SPACE));
+	}
+
+	private void setActionSet2(final PlayerConfig pPlayerConfig) {
+		pPlayerConfig.setMoveForward(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_5));
+		pPlayerConfig.setMoveBackward(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_2));
+		pPlayerConfig.setRotateLeft(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_1));
+		pPlayerConfig.setRotateRight(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_3));
+		pPlayerConfig.setTurrentRotateLeft(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_4));
+		pPlayerConfig.setTurrentRotateRight(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_6));
+		pPlayerConfig.setFire(new GdxInputKeyPressedAction(Input.Keys.NUMPAD_0));
 	}
 
 }

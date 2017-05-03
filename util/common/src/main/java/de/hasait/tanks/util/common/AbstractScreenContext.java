@@ -28,20 +28,13 @@ public abstract class AbstractScreenContext implements Disposable {
 
 	private final Game<?> _game;
 
-	private final int _viewportW, _viewportH;
-	private final Rectangle _viewportR;
-
 	private final SpriteBatch _batch;
 	private final BitmapFont _font;
 
-	protected AbstractScreenContext(final Game<?> pGame, final int pViewportW, final int pViewportH) {
+	protected AbstractScreenContext(final Game<?> pGame) {
 		super();
 
 		_game = pGame;
-
-		_viewportW = pViewportW;
-		_viewportH = pViewportH;
-		_viewportR = new Rectangle(0, 0, _viewportW, _viewportH);
 
 		_batch = new SpriteBatch();
 		_font = new BitmapFont();
@@ -51,18 +44,6 @@ public abstract class AbstractScreenContext implements Disposable {
 	public void dispose() {
 		_font.dispose();
 		_batch.dispose();
-	}
-
-	public final int getViewportH() {
-		return _viewportH;
-	}
-
-	public final int getViewportW() {
-		return _viewportW;
-	}
-
-	public final boolean viewportContains(final float pX, final float pY) {
-		return _viewportR.contains(pX, pY);
 	}
 
 	SpriteBatch getBatch() {

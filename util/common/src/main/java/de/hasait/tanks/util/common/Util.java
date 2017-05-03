@@ -16,12 +16,17 @@
 
 package de.hasait.tanks.util.common;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  *
  */
 public final class Util {
 
 	public static final String EMPTY = "";
+
+	public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
 	public static boolean isBlank(final CharSequence pText) {
 		final int length;

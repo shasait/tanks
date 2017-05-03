@@ -27,7 +27,7 @@ import com.badlogic.gdx.math.Vector2;
 /**
  *
  */
-public class Tank extends AbstractObject<TankState> {
+public class Tank extends AbstractGameObject<TankState> {
 
 	private static TankState createState(final long pSpawnAtMillis) {
 		final TankState state = new TankState();
@@ -88,7 +88,7 @@ public class Tank extends AbstractObject<TankState> {
 		final Polygon p1 = _boundsHolder.get();
 		final Polygon p2 = pTank._boundsHolder.get();
 
-		if (Intersector.intersectPolygons(_boundsHolder.get(), pTank._boundsHolder.get(), new Polygon())) {
+		if (Intersector.intersectPolygons(p1, p2, new Polygon())) {
 			return dst;
 		}
 

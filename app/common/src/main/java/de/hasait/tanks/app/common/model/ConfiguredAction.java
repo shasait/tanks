@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package de.hasait.tanks.app.common;
-
-import de.hasait.tanks.util.common.AbstractScreenContext;
-import de.hasait.tanks.util.common.Game;
+package de.hasait.tanks.app.common.model;
 
 /**
  *
  */
-public class TanksScreenContext extends AbstractScreenContext {
+public interface ConfiguredAction {
 
-	public TanksScreenContext(Game<TanksScreenContext> pGame) {
-		super(pGame);
-	}
+	boolean isActive();
 
 }
