@@ -204,9 +204,7 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 	}
 
 	protected final void drawText(final CharSequence pText) {
-		final BitmapFont font = _context.getFont();
-		font.draw(_context.getBatch(), pText, _textMargin, _viewportH - _textMargin - _textLine * font.getLineHeight());
-		_textLine++;
+		drawText(_textLine--, pText, AlignH.LEFT, AlignV.TOP);
 	}
 
 	protected final void drawText(final int pLine, final CharSequence pText) {
@@ -338,9 +336,9 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 	}
 
 	public enum AlignV {
-		TOP(0, 0, 1),
+		TOP(1, 0, -1),
 		CENTER(0.5f, 0, 0),
-		BOTTOM(1, -1, -1);
+		BOTTOM(0, 1, 1);
 
 		private final float _vhFac, _lhFac, _mFac;
 
