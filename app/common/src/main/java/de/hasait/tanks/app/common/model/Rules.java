@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class Rules implements Serializable {
 
 	public int _maxDamage = 5;
+	public long _spawnTimeMillis = TimeUnit.SECONDS.toMillis(3);
 	public long _respawnTimeMillis = TimeUnit.SECONDS.toMillis(10);
 	public long _timeMillisBetweenShots = 1000;
 

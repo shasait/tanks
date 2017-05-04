@@ -105,12 +105,12 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		_tanksLogic.update(getTimeMillis(), pDeltaTimeSeconds);
 	}
 
-	private TankState drawTankStatusText(final Tank pTank, final boolean pDamage) {
+	private TankState drawTankStatusText(final Tank pTank, final boolean pDamageInsteadOfPointsVisible, final boolean pSpawnVisible) {
 		final TankState state = pTank.getState();
 		final StringBuilder sb = new StringBuilder();
 		sb.append(pTank.getName());
 		sb.append(": ");
-		if (pDamage) {
+		if (pDamageInsteadOfPointsVisible) {
 			final int maxDamage = _tanksLogic.getRules()._maxDamage;
 			final int health = Math.max(0, maxDamage - state._damage);
 			final int damage = maxDamage - health;
@@ -119,10 +119,12 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		} else {
 			sb.append(state._points);
 		}
-		if (state._respawnAtMillis != null) {
-			sb.append(" (respawn in ");
-			sb.append((Math.max(0, state._respawnAtMillis - getTimeMillis())) / 1000);
-			sb.append("s)");
+		if (pSpawnVisible) {
+			if (state._spawnAtMillis != null) {
+				sb.append(" (spawn in ");
+				sb.append((Math.max(0, state._spawnAtMillis - getTimeMillis())) / 1000);
+				sb.append("s)");
+			}
 		}
 		drawText(sb.toString());
 		drawText("");
@@ -130,7 +132,7 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 	}
 
 	private void paintFrame() {
-		_tanksLogic.getLocalTanks().forEach(pTank -> drawTankStatusText(pTank, true));
+		_tanksLogic.getLocalTanks().forEach(pTank -> drawTankStatusText(pTank, true, false));
 
 		for (final Bullet bullet : _tanksLogic.getBullets()) {
 			final BulletState state = bullet.getState();
@@ -139,8 +141,8 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 			);
 		}
 		for (final Tank tank : _tanksLogic.getTanks()) {
-			final TankState state = drawTankStatusText(tank, false);
-			if (state._respawnAtMillis == null) {
+			final TankState state = drawTankStatusText(tank, false, true);
+			if (state._spawnAtMillis == null) {
 				drawTexture(_tankImage, state._centerX, state._centerY, _model.getModel().getTankW(), _model.getModel().getTankH(),
 							state._rotation
 				);

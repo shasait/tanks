@@ -79,7 +79,7 @@ public class TanksLogic {
 
 			updateTank(updateContext);
 			handleTankDamage(updateContext);
-			handleTankRespawn(updateContext);
+			handleTankReSpawn(updateContext);
 			updateBullets(updateContext);
 
 
@@ -116,25 +116,30 @@ public class TanksLogic {
 		final TankState newTankState = pUpdateContext._newTankState;
 
 		final int tankDamageIncrement = localTank.getAndResetDamageIncrement();
-		if (tankDamageIncrement > 0 && newTankState._respawnAtMillis == null) {
+		if (tankDamageIncrement > 0 && newTankState._spawnAtMillis == null) {
 			pUpdateContext._tankDirty = true;
 			newTankState._damage += tankDamageIncrement;
 			if (newTankState._damage >= getRules()._maxDamage) {
-				newTankState._respawnAtMillis = pUpdateContext._timeMillis + getRules()._respawnTimeMillis;
+				newTankState._spawnAtMillis = pUpdateContext._timeMillis + getRules()._respawnTimeMillis;
 			}
 		}
 	}
 
-	private void handleTankRespawn(final UpdateContext pUpdateContext) {
+	private void handleTankReSpawn(final UpdateContext pUpdateContext) {
 		final TankState newTankState = pUpdateContext._newTankState;
 
-		if (newTankState._respawnAtMillis != null && newTankState._respawnAtMillis < pUpdateContext._timeMillis) {
+		if (newTankState._spawnAtMillis != null && newTankState._spawnAtMillis < pUpdateContext._timeMillis) {
 			pUpdateContext._tankDirty = true;
 			newTankState._damage = 0;
-			newTankState._respawnAtMillis = null;
-			newTankState._centerX = MathUtils.random() * _model.getModel().getWorldW();
-			newTankState._centerY = MathUtils.random() * _model.getModel().getWorldH();
-			newTankState._rotation = MathUtils.random() * 360.0f;
+			newTankState._spawnAtMillis = null;
+			while (true) {
+				newTankState._centerX = MathUtils.random() * _model.getModel().getWorldW();
+				newTankState._centerY = MathUtils.random() * _model.getModel().getWorldH();
+				newTankState._rotation = MathUtils.random() * 360.0f;
+				if (determineIntersections(pUpdateContext._tank, newTankState).isEmpty()) {
+					break;
+				}
+			}
 		}
 	}
 
@@ -246,7 +251,7 @@ public class TanksLogic {
 		}
 
 		if (tankActions._fire) {
-			if (newTankState._respawnAtMillis == null
+			if (newTankState._spawnAtMillis == null
 					&& pUpdateContext._timeMillis - localTank.getLastShotTimeMillis() > getRules()._timeMillisBetweenShots) {
 				localTank.setLastShotTimeMillis(pUpdateContext._timeMillis);
 				_model.spawnBullet(tank);

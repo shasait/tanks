@@ -32,7 +32,7 @@ public class Tank extends AbstractGameObject<TankState> {
 	private static TankState createState(final long pSpawnAtMillis) {
 		final TankState state = new TankState();
 		state._uuid = UUID.randomUUID().toString();
-		state._respawnAtMillis = pSpawnAtMillis;
+		state._spawnAtMillis = pSpawnAtMillis;
 		return state;
 	}
 

@@ -166,7 +166,7 @@ public class DistributedModel implements Disposable {
 	public void spawnTank(final PlayerConfig pPlayerConfig) {
 		final JChannel channel = getChannelNotNull();
 		final Tank tank = new Tank(channel.getAddressAsString(), pPlayerConfig.getName(), getModel().getTankW(), getModel().getTankH(),
-								   TimeUtils.millis() + getModel().getRules()._respawnTimeMillis
+								   TimeUtils.millis() + getModel().getRules()._spawnTimeMillis
 		);
 		final LocalTank localTank = new LocalTank(tank.getUuid(), pPlayerConfig);
 		getModel().addLocalTank(localTank);
