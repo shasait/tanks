@@ -62,34 +62,54 @@ public class Tank extends AbstractGameObject<TankState> {
 		return _boundsHolder.get().contains(pX, pY);
 	}
 
+	public Polygon createBounds(final TankState pState) {
+		final float w2 = _width / 2.0f;
+		final float h2 = _height / 2.0f;
+		final Polygon bounds = new Polygon(new float[]{
+				-w2,
+				h2,
+				w2,
+				h2,
+				w2,
+				-h2,
+				-w2,
+				-h2
+		});
+		bounds.setPosition(pState._centerX, pState._centerY);
+		bounds.setRotation(pState._rotation);
+		return bounds;
+	}
+
+	public Polygon getBounds() {
+		return _boundsHolder.get();
+	}
+
 	public String getName() {
 		return _name;
+	}
+
+	public float getWhDist2() {
+		return _whDist2;
 	}
 
 	/**
 	 * @return distance if intersecting; otherwise null.
 	 */
-	public Float intersects(final Tank pTank) {
-		if (pTank == null) {
+	public Float intersects(final Polygon pOtherBounds, final float pOtherWhDist2) {
+		if (pOtherBounds == null) {
 			return null;
 		}
-		if (getUuid().equals(pTank.getUuid())) {
-			return null;
-		}
-
 		final TankState state1 = getState();
-		final TankState state2 = pTank.getState();
 
-		final float dst = Vector2.dst(state1._centerX, state1._centerY, state2._centerX, state2._centerY);
-		if (dst > _whDist2 + pTank._whDist2) {
+		final float distance = Vector2.dst(state1._centerX, state1._centerY, pOtherBounds.getX(), pOtherBounds.getY());
+		if (distance > _whDist2 + pOtherWhDist2) {
 			return null;
 		}
 
-		final Polygon p1 = _boundsHolder.get();
-		final Polygon p2 = pTank._boundsHolder.get();
+		final Polygon bounds = _boundsHolder.get();
 
-		if (Intersector.intersectPolygons(p1, p2, new Polygon())) {
-			return dst;
+		if (Intersector.intersectPolygons(bounds, pOtherBounds, new Polygon())) {
+			return distance;
 		}
 
 		return null;
@@ -115,21 +135,7 @@ public class Tank extends AbstractGameObject<TankState> {
 	}
 
 	private void updateBounds(final TankState pState) {
-		final float w2 = _width / 2.0f;
-		final float h2 = _height / 2.0f;
-		final Polygon bounds = new Polygon(new float[]{
-				-w2,
-				h2,
-				w2,
-				h2,
-				w2,
-				-h2,
-				-w2,
-				-h2
-		});
-		bounds.setPosition(pState._centerX, pState._centerY);
-		bounds.setRotation(pState._rotation);
-		_boundsHolder.set(bounds);
+		_boundsHolder.set(createBounds(pState));
 	}
 
 	private Object writeReplace() throws ObjectStreamException {

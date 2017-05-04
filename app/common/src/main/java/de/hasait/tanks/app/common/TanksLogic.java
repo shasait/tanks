@@ -17,9 +17,12 @@
 package de.hasait.tanks.app.common;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 
 import de.hasait.tanks.app.common.model.Bullet;
 import de.hasait.tanks.app.common.model.BulletState;
@@ -91,6 +94,23 @@ public class TanksLogic {
 		}
 	}
 
+	private Map<Tank, Float> determineIntersections(final Tank pTank, final TankState pTankState) {
+		final Polygon bounds = pTankState == null ? pTank.getBounds() : pTank.createBounds(pTankState);
+		final float whDist2 = pTank.getWhDist2();
+
+		final Map<Tank, Float> intersections = new HashMap<>();
+		for (final Tank otherTank : getTanks()) {
+			if (pTank == otherTank) {
+				continue;
+			}
+			final Float distanceIfIntersects = otherTank.intersects(bounds, whDist2);
+			if (distanceIfIntersects != null) {
+				intersections.put(otherTank, distanceIfIntersects);
+			}
+		}
+		return intersections;
+	}
+
 	private void handleTankDamage(final UpdateContext pUpdateContext) {
 		final LocalTank localTank = pUpdateContext._localTank;
 		final TankState newTankState = pUpdateContext._newTankState;
@@ -160,6 +180,7 @@ public class TanksLogic {
 
 	private void updateTank(final UpdateContext pUpdateContext) {
 		final LocalTank localTank = pUpdateContext._localTank;
+		final Tank tank = pUpdateContext._tank;
 		final TankState newTankState = pUpdateContext._newTankState;
 		final float speed = pUpdateContext._deltaTimeSeconds * _model.getModel().getTankSpeed();
 
@@ -175,10 +196,25 @@ public class TanksLogic {
 			moveSpeed -= speed;
 		}
 		if (moveSpeed != 0.0f) {
+			final Map<Tank, Float> beforeIntersections = determineIntersections(tank, null);
+			tank.move(moveSpeed, newTankState);
+			final Map<Tank, Float> afterIntersections = determineIntersections(tank, newTankState);
+			boolean validMove = true;
+			for (final Map.Entry<Tank, Float> afterEntry : afterIntersections.entrySet()) {
+				final Float afterDistance = afterEntry.getValue();
+				final Float beforeDistance = beforeIntersections.get(afterEntry.getKey());
+				if (beforeDistance == null || afterDistance < beforeDistance) {
+					validMove = false;
+					break;
+				}
+			}
 
-
-			pUpdateContext._tank.move(moveSpeed, newTankState);
-			pUpdateContext._tankDirty = true;
+			if (!validMove) {
+				newTankState._centerX = pUpdateContext._oldTankState._centerX;
+				newTankState._centerY = pUpdateContext._oldTankState._centerY;
+			} else {
+				pUpdateContext._tankDirty = true;
+			}
 		}
 		if (newTankState._centerX < 0) {
 			newTankState._centerX = 0;
@@ -213,7 +249,7 @@ public class TanksLogic {
 			if (newTankState._respawnAtMillis == null
 					&& pUpdateContext._timeMillis - localTank.getLastShotTimeMillis() > getRules()._timeMillisBetweenShots) {
 				localTank.setLastShotTimeMillis(pUpdateContext._timeMillis);
-				_model.spawnBullet(pUpdateContext._tank);
+				_model.spawnBullet(tank);
 				_callback.onSpawnBullet();
 			}
 		}
@@ -234,6 +270,7 @@ public class TanksLogic {
 
 		private final UpdateMsg _updateMsg;
 
+		private final TankState _oldTankState;
 		private final TankState _newTankState;
 
 		private boolean _tankDirty;
@@ -249,8 +286,8 @@ public class TanksLogic {
 
 			_updateMsg = new UpdateMsg();
 
-			final TankState oldTankState = _tank.getState();
-			_newTankState = oldTankState.clone();
+			_oldTankState = _tank.getState();
+			_newTankState = _oldTankState.clone();
 			_tankDirty = false;
 		}
 	}
