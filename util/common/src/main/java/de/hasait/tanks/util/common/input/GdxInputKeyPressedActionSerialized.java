@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package de.hasait.tanks.app.common.model;
+package de.hasait.tanks.util.common.input;
+
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 /**
  *
  */
-public interface ConfiguredAction {
+public class GdxInputKeyPressedActionSerialized implements Serializable {
 
-	boolean isActive();
+	public int _keycode;
+
+	private Object readResolve() throws ObjectStreamException {
+		return new GdxInputKeyPressedAction(_keycode);
+	}
 
 }

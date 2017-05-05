@@ -28,6 +28,7 @@ import com.badlogic.gdx.graphics.Texture;
 import de.hasait.tanks.app.common.model.Bullet;
 import de.hasait.tanks.app.common.model.BulletState;
 import de.hasait.tanks.app.common.model.DistributedModel;
+import de.hasait.tanks.app.common.model.LocalTank;
 import de.hasait.tanks.app.common.model.Tank;
 import de.hasait.tanks.app.common.model.TankState;
 import de.hasait.tanks.util.common.Abstract2DScreen;
@@ -48,6 +49,7 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 			}
 			return super.keyDown(keycode);
 		}
+
 
 	};
 
@@ -92,6 +94,10 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		setTextMargin(10.0f);
 
 		addInputProcessor(_toggleBackgroundMusicInputProcessor);
+
+		for (final LocalTank tank : _model.getModel().getLocalLocalTanks()) {
+			tank.getPlayerConfig().initActions(this);
+		}
 	}
 
 	@Override

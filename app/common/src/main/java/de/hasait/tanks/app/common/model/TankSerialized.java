@@ -22,14 +22,16 @@ import java.io.Serializable;
 /**
  *
  */
-public class SerializableBullet implements Serializable {
+public class TankSerialized implements Serializable {
 
 	public String _ownerAddress;
-	public String _tankUuid;
-	public BulletState _state;
+	public String _name;
+	public float _width;
+	public float _height;
+	public TankState _state;
 
 	private Object readResolve() throws ObjectStreamException {
-		return new Bullet(_ownerAddress, _tankUuid, _state);
+		return new Tank(_ownerAddress, _name, _width, _height, _state);
 	}
 
 }

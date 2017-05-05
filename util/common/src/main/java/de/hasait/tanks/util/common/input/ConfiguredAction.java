@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package de.hasait.tanks.app.common.model;
+package de.hasait.tanks.util.common.input;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
+
+import com.badlogic.gdx.utils.Disposable;
+
+import de.hasait.tanks.util.common.Abstract2DScreen;
 
 /**
  *
  */
-public class SerializableTank implements Serializable {
+public interface ConfiguredAction extends Disposable, Serializable {
 
-	public String _ownerAddress;
-	public String _name;
-	public float _width;
-	public float _height;
-	public TankState _state;
+	/**
+	 * @return Return state between 0 and 1.
+	 */
+	float getState();
 
-	private Object readResolve() throws ObjectStreamException {
-		return new Tank(_ownerAddress, _name, _width, _height, _state);
-	}
+	void init(final Abstract2DScreen<?> pScreen);
 
 }

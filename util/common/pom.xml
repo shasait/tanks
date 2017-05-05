@@ -31,6 +31,10 @@
 			<artifactId>gdx</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.badlogicgames.gdx</groupId>
+			<artifactId>gdx-controllers</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.jgroups</groupId>
 			<artifactId>jgroups</artifactId>
 		</dependency>

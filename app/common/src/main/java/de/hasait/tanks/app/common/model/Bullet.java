@@ -53,11 +53,11 @@ public class Bullet extends AbstractGameObject<BulletState> {
 
 
 	private Object writeReplace() throws ObjectStreamException {
-		final SerializableBullet serializable = new SerializableBullet();
-		serializable._ownerAddress = getOwnerAddress();
-		serializable._tankUuid = _tankUuid;
-		serializable._state = getState();
-		return serializable;
+		final BulletSerialized serialized = new BulletSerialized();
+		serialized._ownerAddress = getOwnerAddress();
+		serialized._tankUuid = _tankUuid;
+		serialized._state = getState();
+		return serialized;
 	}
 
 }

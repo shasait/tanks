@@ -68,7 +68,7 @@ public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 					.submit(() -> _model.connect(_config.getRoomName(), _config.getWishPiecesX(), _config.getWishPiecesY()));
 		} else if (_connect.isDone() && _model.hasModel()) {
 			for (final PlayerConfig playerConfig : _config.getPlayers()) {
-				_model.spawnTank(playerConfig);
+				_model.createTank(playerConfig);
 			}
 			setScreen(new GameScreen(getContext(), _model));
 		}

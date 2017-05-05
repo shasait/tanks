@@ -18,8 +18,6 @@ package de.hasait.tanks.app.common.model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.hasait.tanks.app.common.TankActions;
-
 /**
  *
  */
@@ -37,16 +35,16 @@ public class LocalTank {
 		_playerConfig = pPlayerConfig;
 	}
 
-	public void fillActions(final TankActions pTankActions) {
-		_playerConfig.fillActions(pTankActions);
-	}
-
 	public int getAndResetDamageIncrement() {
 		return _tankDamageIncrement.getAndSet(0);
 	}
 
 	public long getLastShotTimeMillis() {
 		return _lastShotTimeMillis;
+	}
+
+	public PlayerConfig getPlayerConfig() {
+		return _playerConfig;
 	}
 
 	public String getTankUuid() {

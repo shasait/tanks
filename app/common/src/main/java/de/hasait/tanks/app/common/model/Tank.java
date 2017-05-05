@@ -139,13 +139,13 @@ public class Tank extends AbstractGameObject<TankState> {
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		final SerializableTank serializable = new SerializableTank();
-		serializable._ownerAddress = getOwnerAddress();
-		serializable._name = _name;
-		serializable._width = _width;
-		serializable._height = _height;
-		serializable._state = getState();
-		return serializable;
+		final TankSerialized serialized = new TankSerialized();
+		serialized._ownerAddress = getOwnerAddress();
+		serialized._name = _name;
+		serialized._width = _width;
+		serialized._height = _height;
+		serialized._state = getState();
+		return serialized;
 	}
 
 }

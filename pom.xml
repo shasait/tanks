@@ -13,7 +13,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.hasait.tanks</groupId>
@@ -63,7 +64,7 @@
 			</roles>
 		</developer>
 	</developers>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -109,25 +110,8 @@
 			</dependency>
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
-				<artifactId>gdx</artifactId>
-				<version>${dependency.version.gdx}</version>
-				<classifier>sources</classifier>
-			</dependency>
-			<dependency>
-				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-backend-android</artifactId>
 				<version>${dependency.version.gdx}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.badlogicgames.gdx</groupId>
-				<artifactId>gdx-backend-gwt</artifactId>
-				<version>${dependency.version.gdx}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.badlogicgames.gdx</groupId>
-				<artifactId>gdx-backend-gwt</artifactId>
-				<version>${dependency.version.gdx}</version>
-				<classifier>sources</classifier>
 			</dependency>
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
@@ -155,6 +139,45 @@
 			<dependency>
 				<groupId>com.badlogicgames.gdx</groupId>
 				<artifactId>gdx-platform</artifactId>
+				<version>${dependency.version.gdx}</version>
+				<classifier>natives-desktop</classifier>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers</artifactId>
+				<version>${dependency.version.gdx}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers-android</artifactId>
+				<version>${dependency.version.gdx}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers-desktop</artifactId>
+				<version>${dependency.version.gdx}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers-platform</artifactId>
+				<version>${dependency.version.gdx}</version>
+				<classifier>natives-armeabi</classifier>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers-platform</artifactId>
+				<version>${dependency.version.gdx}</version>
+				<classifier>natives-armeabi-v7a</classifier>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers-platform</artifactId>
+				<version>${dependency.version.gdx}</version>
+				<classifier>natives-x86</classifier>
+			</dependency>
+			<dependency>
+				<groupId>com.badlogicgames.gdx</groupId>
+				<artifactId>gdx-controllers-platform</artifactId>
 				<version>${dependency.version.gdx}</version>
 				<classifier>natives-desktop</classifier>
 			</dependency>

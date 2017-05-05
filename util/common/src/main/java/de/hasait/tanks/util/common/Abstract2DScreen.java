@@ -165,6 +165,10 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 		return _viewportR.contains(pX, pY);
 	}
 
+	final InputMultiplexer getInputMultiplexer() {
+		return _inputMultiplexer;
+	}
+
 	protected final void addDisposable(final Disposable pDisposable) {
 		_disposables.add(pDisposable);
 	}
@@ -256,10 +260,6 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 
 	protected final boolean isBackgroundMusicPlaying() {
 		return _backgroundMusicPlaying;
-	}
-
-	protected final void removeInputProcessor(final InputProcessor pInputProcessor) {
-		_inputMultiplexer.removeProcessor(pInputProcessor);
 	}
 
 	protected abstract void renderInternal(final float pDelta);

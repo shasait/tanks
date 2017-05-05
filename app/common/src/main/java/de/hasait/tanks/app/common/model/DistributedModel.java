@@ -124,6 +124,25 @@ public class DistributedModel implements Disposable {
 		}
 	}
 
+	public void createBullet(final Tank pTank) {
+		final JChannel channel = getChannelNotNull();
+		final TankState state = pTank.getState();
+		final Bullet bullet = new Bullet(channel.getAddressAsString(), pTank.getUuid(), state._centerX, state._centerY,
+										 state._rotation + state._turretRotation
+		);
+		networkSend(bullet);
+	}
+
+	public void createTank(final PlayerConfig pPlayerConfig) {
+		final JChannel channel = getChannelNotNull();
+		final Tank tank = new Tank(channel.getAddressAsString(), pPlayerConfig.getName(), getModel().getTankW(), getModel().getTankH(),
+								   TimeUtils.millis() + getModel().getRules()._spawnTimeMillis
+		);
+		final LocalTank localTank = new LocalTank(tank.getUuid(), pPlayerConfig);
+		getModel().addLocalTank(localTank);
+		networkSend(tank);
+	}
+
 	@Override
 	public void dispose() {
 		final JChannel channel = _channel.getAndSet(null);
@@ -152,25 +171,6 @@ public class DistributedModel implements Disposable {
 		} catch (final Exception pE) {
 			throw new RuntimeException(pE);
 		}
-	}
-
-	public void spawnBullet(final Tank pTank) {
-		final JChannel channel = getChannelNotNull();
-		final TankState state = pTank.getState();
-		final Bullet bullet = new Bullet(channel.getAddressAsString(), pTank.getUuid(), state._centerX, state._centerY,
-										 state._rotation + state._turretRotation
-		);
-		networkSend(bullet);
-	}
-
-	public void spawnTank(final PlayerConfig pPlayerConfig) {
-		final JChannel channel = getChannelNotNull();
-		final Tank tank = new Tank(channel.getAddressAsString(), pPlayerConfig.getName(), getModel().getTankW(), getModel().getTankH(),
-								   TimeUtils.millis() + getModel().getRules()._spawnTimeMillis
-		);
-		final LocalTank localTank = new LocalTank(tank.getUuid(), pPlayerConfig);
-		getModel().addLocalTank(localTank);
-		networkSend(tank);
 	}
 
 	private JChannel getChannelNotNull() {

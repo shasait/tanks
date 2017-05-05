@@ -16,32 +16,32 @@
 
 package de.hasait.tanks.app.common.model;
 
+import java.io.Serializable;
+
 import de.hasait.tanks.app.common.TankActions;
+import de.hasait.tanks.util.common.Abstract2DScreen;
+import de.hasait.tanks.util.common.input.ConfiguredAction;
 
 /**
  *
  */
-public class PlayerConfig {
+public class PlayerConfig implements Serializable {
 
-	private final String _name;
+	private String _name;
 
 	private ConfiguredAction _moveForward, _moveBackward;
 	private ConfiguredAction _rotateLeft, _rotateRight;
 	private ConfiguredAction _turrentRotateLeft, _turrentRotateRight;
 	private ConfiguredAction _fire;
 
-	public PlayerConfig(final String pName) {
-		_name = pName;
-	}
-
 	public void fillActions(final TankActions pTankActions) {
-		pTankActions._moveForward = isActive(_moveForward);
-		pTankActions._moveBackward = isActive(_moveBackward);
-		pTankActions._rotateLeft = isActive(_rotateLeft);
-		pTankActions._rotateRight = isActive(_rotateRight);
-		pTankActions._turrentRotateLeft = isActive(_turrentRotateLeft);
-		pTankActions._turrentRotateRight = isActive(_turrentRotateRight);
-		pTankActions._fire = isActive(_fire);
+		pTankActions._moveForward = getState(_moveForward);
+		pTankActions._moveBackward = getState(_moveBackward);
+		pTankActions._rotateLeft = getState(_rotateLeft);
+		pTankActions._rotateRight = getState(_rotateRight);
+		pTankActions._turrentRotateLeft = getState(_turrentRotateLeft);
+		pTankActions._turrentRotateRight = getState(_turrentRotateRight);
+		pTankActions._fire = getState(_fire);
 	}
 
 	public ConfiguredAction getFire() {
@@ -76,6 +76,16 @@ public class PlayerConfig {
 		return _turrentRotateRight;
 	}
 
+	public void initActions(final Abstract2DScreen<?> pScreen) {
+		_moveForward.init(pScreen);
+		_moveBackward.init(pScreen);
+		_rotateLeft.init(pScreen);
+		_rotateRight.init(pScreen);
+		_turrentRotateLeft.init(pScreen);
+		_turrentRotateRight.init(pScreen);
+		_fire.init(pScreen);
+	}
+
 	public void setFire(final ConfiguredAction pFire) {
 		_fire = pFire;
 	}
@@ -86,6 +96,10 @@ public class PlayerConfig {
 
 	public void setMoveForward(final ConfiguredAction pMoveForward) {
 		_moveForward = pMoveForward;
+	}
+
+	public void setName(final String pName) {
+		_name = pName;
 	}
 
 	public void setRotateLeft(final ConfiguredAction pRotateLeft) {
@@ -104,8 +118,8 @@ public class PlayerConfig {
 		_turrentRotateRight = pTurrentRotateRight;
 	}
 
-	private boolean isActive(final ConfiguredAction pAction) {
-		return pAction != null && pAction.isActive();
+	private float getState(final ConfiguredAction pAction) {
+		return pAction != null ? pAction.getState() : 0.0f;
 	}
 
 }

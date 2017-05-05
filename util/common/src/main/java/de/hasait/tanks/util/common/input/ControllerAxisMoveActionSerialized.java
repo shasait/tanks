@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package de.hasait.tanks.app.common;
+package de.hasait.tanks.util.common.input;
+
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 /**
  *
  */
-public class TankActions {
+public class ControllerAxisMoveActionSerialized implements Serializable {
 
-	public float _moveForward, _moveBackward;
-	public float _rotateLeft, _rotateRight;
-	public float _turrentRotateLeft, _turrentRotateRight;
-	public float _fire;
+	public String _controllerName;
+	public int _axisIndex;
+	public boolean _positive;
+
+	private Object readResolve() throws ObjectStreamException {
+		return new ControllerAxisMoveAction(_controllerName, _axisIndex, _positive);
+	}
 
 }

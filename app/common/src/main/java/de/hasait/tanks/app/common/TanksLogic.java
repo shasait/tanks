@@ -190,15 +190,15 @@ public class TanksLogic {
 		final float speed = pUpdateContext._deltaTimeSeconds * _model.getModel().getTankSpeed();
 
 		final TankActions tankActions = new TankActions();
-		localTank.fillActions(tankActions);
+		localTank.getPlayerConfig().fillActions(tankActions);
 
 
 		float moveSpeed = 0.0f;
-		if (tankActions._moveForward) {
-			moveSpeed += speed;
+		if (tankActions._moveForward != 0.0f) {
+			moveSpeed += tankActions._moveForward * speed;
 		}
-		if (tankActions._moveBackward) {
-			moveSpeed -= speed;
+		if (tankActions._moveBackward != 0.0f) {
+			moveSpeed -= tankActions._moveBackward * speed;
 		}
 		if (moveSpeed != 0.0f) {
 			final Map<Tank, Float> beforeIntersections = determineIntersections(tank, null);
@@ -233,28 +233,36 @@ public class TanksLogic {
 		if (newTankState._centerY > _model.getModel().getWorldH()) {
 			newTankState._centerY = _model.getModel().getWorldH();
 		}
-		if (tankActions._rotateLeft && !tankActions._rotateRight) {
-			newTankState._rotation += speed;
-			pUpdateContext._tankDirty = true;
+
+		float rotationSpeed = 0.0f;
+		if (tankActions._rotateLeft != 0.0f) {
+			rotationSpeed += tankActions._rotateLeft * speed;
 		}
-		if (tankActions._rotateRight && !tankActions._rotateLeft) {
-			newTankState._rotation -= speed;
-			pUpdateContext._tankDirty = true;
+		if (tankActions._rotateRight != 0.0f) {
+			rotationSpeed -= tankActions._rotateRight * speed;
 		}
-		if (tankActions._turrentRotateLeft && !tankActions._turrentRotateRight) {
-			newTankState._turretRotation += speed;
-			pUpdateContext._tankDirty = true;
-		}
-		if (tankActions._turrentRotateRight && !tankActions._turrentRotateLeft) {
-			newTankState._turretRotation -= speed;
+		if (rotationSpeed != 0.0f) {
+			newTankState._rotation += rotationSpeed;
 			pUpdateContext._tankDirty = true;
 		}
 
-		if (tankActions._fire) {
+		float turretRotationSpeed = 0.0f;
+		if (tankActions._turrentRotateLeft != 0.0f) {
+			turretRotationSpeed += tankActions._turrentRotateLeft * speed;
+		}
+		if (tankActions._turrentRotateRight != 0.0f) {
+			turretRotationSpeed -= tankActions._turrentRotateRight * speed;
+		}
+		if (turretRotationSpeed != 0.0f) {
+			newTankState._turretRotation += turretRotationSpeed;
+			pUpdateContext._tankDirty = true;
+		}
+
+		if (tankActions._fire != 0.0f) {
 			if (newTankState._spawnAtMillis == null
 					&& pUpdateContext._timeMillis - localTank.getLastShotTimeMillis() > getRules()._timeMillisBetweenShots) {
 				localTank.setLastShotTimeMillis(pUpdateContext._timeMillis);
-				_model.spawnBullet(tank);
+				_model.createBullet(tank);
 				_callback.onSpawnBullet();
 			}
 		}

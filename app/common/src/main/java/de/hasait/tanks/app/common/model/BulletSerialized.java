@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 
-package de.hasait.tanks.app.common;
+package de.hasait.tanks.app.common.model;
 
-import com.badlogic.gdx.Gdx;
-
-import de.hasait.tanks.app.common.model.ConfiguredAction;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 /**
  *
  */
-public class GdxInputKeyPressedAction implements ConfiguredAction {
+public class BulletSerialized implements Serializable {
 
-	private final int _key;
+	public String _ownerAddress;
+	public String _tankUuid;
+	public BulletState _state;
 
-	public GdxInputKeyPressedAction(final int pKey) {
-		_key = pKey;
-	}
-
-	@Override
-	public boolean isActive() {
-		return Gdx.input.isKeyPressed(_key);
+	private Object readResolve() throws ObjectStreamException {
+		return new Bullet(_ownerAddress, _tankUuid, _state);
 	}
 
 }

@@ -19,25 +19,36 @@ package de.hasait.tanks.app.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.hasait.tanks.app.common.model.GameConfig;
 import de.hasait.tanks.app.common.model.PlayerConfig;
 import de.hasait.tanks.util.common.Abstract2DScreen;
 import de.hasait.tanks.util.common.Util;
+import de.hasait.tanks.util.common.input.ConfiguredAction;
+import de.hasait.tanks.util.common.input.ConfiguredActionFactory;
+import de.hasait.tanks.util.common.input.GdxInputKeyPressedAction;
 
 /**
  *
  */
 public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
+
+	private final AtomicReference<ConfiguredActionFactory> _configuredActionFactory = new AtomicReference<>();
 
 	private final TextField _roomNameField;
 	private final List<TextField> _playerNameFields = new ArrayList<>();
@@ -49,27 +60,54 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		setBackgroundColor(new Color(0.0f, 0.0f, 0.2f, 1.0f));
 
-		final Label titleLabel = createLabel("Welcome to Tanks", 2.0f);
-		_roomNameField = createTextField("Default");
-		for (int i = 0; i < 2; i++) {
-			_playerNameFields.add(createTextField());
-		}
-		_connectButton = createTextButton("Connect");
-
 		final Table layout = addLayout();
 		layout.setFillParent(true);
-		layout.defaults().pad(5.0f);
+		layout.defaults().pad(5.0f).align(Align.left).fill();
 
+		final Label titleLabel = createLabel("Welcome to Tanks", 2.0f);
 		layout.add(titleLabel).colspan(2).padBottom(20.0f);
+
 		layout.row();
 		layout.add(createLabel("Room"));
+		_roomNameField = createTextField("Default");
 		layout.add(_roomNameField);
-		layout.row();
-		for (int i = 0; i < _playerNameFields.size(); i++) {
-			layout.add(createLabel("Player " + (i + 1)));
-			layout.add(_playerNameFields.get(i));
+
+		for (int i = 0; i < 2; i++) {
 			layout.row();
+			layout.add(createLabel("Player " + (i + 1)));
+			final TextField playerNameField = createTextField();
+			if (i == 0) {
+				playerNameField.setText("Player " + (i + 1));
+			}
+			layout.add(playerNameField);
+			_playerNameFields.add(playerNameField);
+			final PlayerConfig playerConfig = new PlayerConfig();
+			playerNameField.setUserObject(playerConfig);
+
+			if (i == 0) {
+				setActionSet1(playerConfig);
+			}
+			if (i == 1) {
+				setActionSet2(playerConfig);
+			}
+
+			layout.add(actionConfig("Fire", playerConfig::getFire, playerConfig::setFire));
+			layout.row();
+			layout.add(createLabel(Util.EMPTY));
+			layout.add(actionConfig("Move Forward", playerConfig::getMoveForward, playerConfig::setMoveForward));
+			layout.add(actionConfig("Move Backward", playerConfig::getMoveBackward, playerConfig::setMoveBackward));
+			layout.row();
+			layout.add(createLabel(Util.EMPTY));
+			layout.add(actionConfig("Rotate Left", playerConfig::getRotateLeft, playerConfig::setRotateLeft));
+			layout.add(actionConfig("Rotate Right", playerConfig::getRotateRight, playerConfig::setRotateRight));
+			layout.row();
+			layout.add(createLabel(Util.EMPTY));
+			layout.add(actionConfig("Turret Left", playerConfig::getTurrentRotateLeft, playerConfig::setTurrentRotateLeft));
+			layout.add(actionConfig("Turret Right", playerConfig::getTurrentRotateRight, playerConfig::setTurrentRotateRight));
 		}
+
+		layout.row();
+		_connectButton = createTextButton("Connect");
 		layout.add(_connectButton).colspan(2);
 
 		_connectButton.addListener(pEvent -> {
@@ -86,6 +124,11 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 			Gdx.app.exit();
 		}
 
+		final ConfiguredActionFactory configuredActionFactory = _configuredActionFactory.get();
+		if (configuredActionFactory != null && configuredActionFactory.isFinished()) {
+			_configuredActionFactory.set(null);
+		}
+
 		if (_connect) {
 			_connect = false;
 
@@ -96,19 +139,13 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 			final GameConfig config = new GameConfig(roomName, 40, 24);
 			for (int i = 0; i < _playerNameFields.size(); i++) {
-				final String playerName = _playerNameFields.get(i).getText();
+				final TextField playerNameField = _playerNameFields.get(i);
+				final String playerName = playerNameField.getText();
 				if (Util.isBlank(playerName)) {
 					continue;
 				}
-				final PlayerConfig playerConfig = new PlayerConfig(playerName.trim());
-				// TODO make actions configurable
-				if (i == 0) {
-					setActionSet1(playerConfig);
-				}
-				if (i == 1) {
-					setActionSet2(playerConfig);
-				}
-
+				final PlayerConfig playerConfig = (PlayerConfig) playerNameField.getUserObject();
+				playerConfig.setName(playerName.trim());
 				config.getPlayers().add(playerConfig);
 			}
 
@@ -118,6 +155,27 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 			setScreen(new ConnectingScreen(getContext(), config));
 		}
+	}
+
+	private Label actionConfig(final String pTitle, final Supplier<ConfiguredAction> pActionSupplier, final Consumer<ConfiguredAction> pActionConsumer) {
+		final Label label = createLabel(pTitle);
+		final Consumer<ConfiguredAction> actionConsumer = new Consumer<ConfiguredAction>() {
+			@Override
+			public void accept(final ConfiguredAction pAction) {
+				label.setText(pTitle + ": " + pAction);
+				pActionConsumer.accept(pAction);
+			}
+		};
+		actionConsumer.accept(pActionSupplier.get());
+		label.addListener(new ClickListener() {
+			@Override
+			public void clicked(final InputEvent pEvent, final float pX, final float pY) {
+				if (_configuredActionFactory.compareAndSet(null, new ConfiguredActionFactory())) {
+					_configuredActionFactory.get().init(actionConsumer);
+				}
+			}
+		});
+		return label;
 	}
 
 	private void setActionSet1(final PlayerConfig pPlayerConfig) {
