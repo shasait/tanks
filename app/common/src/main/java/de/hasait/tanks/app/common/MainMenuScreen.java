@@ -138,8 +138,7 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 			}
 
 			final GameConfig config = new GameConfig(roomName, 40, 24);
-			for (int i = 0; i < _playerNameFields.size(); i++) {
-				final TextField playerNameField = _playerNameFields.get(i);
+			for (final TextField playerNameField : _playerNameFields) {
 				final String playerName = playerNameField.getText();
 				if (Util.isBlank(playerName)) {
 					continue;
@@ -159,12 +158,9 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	private Label actionConfig(final String pTitle, final Supplier<ConfiguredAction> pActionSupplier, final Consumer<ConfiguredAction> pActionConsumer) {
 		final Label label = createLabel(pTitle);
-		final Consumer<ConfiguredAction> actionConsumer = new Consumer<ConfiguredAction>() {
-			@Override
-			public void accept(final ConfiguredAction pAction) {
-				label.setText(pTitle + ": " + pAction);
-				pActionConsumer.accept(pAction);
-			}
+		final Consumer<ConfiguredAction> actionConsumer = pAction -> {
+			label.setText(pTitle + ": " + pAction);
+			pActionConsumer.accept(pAction);
 		};
 		actionConsumer.accept(pActionSupplier.get());
 		label.addListener(new ClickListener() {

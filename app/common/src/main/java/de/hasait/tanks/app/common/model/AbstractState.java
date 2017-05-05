@@ -31,6 +31,7 @@ public abstract class AbstractState<S extends AbstractState<S>> implements Seria
 
 	public final S clone() {
 		try {
+			//noinspection unchecked
 			return (S) super.clone();
 		} catch (CloneNotSupportedException pE) {
 			throw new RuntimeException(pE);

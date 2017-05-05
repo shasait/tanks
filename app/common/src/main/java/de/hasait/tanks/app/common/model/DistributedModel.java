@@ -86,6 +86,7 @@ public class DistributedModel implements Disposable {
 				public void setState(final InputStream pInput) throws Exception {
 					try (final ObjectInputStream ois = new ObjectInputStream(pInput)) {
 						initModel(new Model(ois.readInt(), ois.readInt()));
+						//noinspection unchecked
 						((Iterable<Object>) ois.readObject()).forEach(DistributedModel.this::networkReceive);
 					}
 				}
