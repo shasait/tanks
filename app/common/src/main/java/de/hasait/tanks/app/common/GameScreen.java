@@ -17,7 +17,6 @@
 package de.hasait.tanks.app.common;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
@@ -39,15 +38,18 @@ import de.hasait.tanks.util.common.Util;
  */
 public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 
-	private final InputProcessor _toggleBackgroundMusicInputProcessor = new InputAdapter() {
+	private final InputProcessor _inputProcessor = new InputAdapter() {
 
 		@Override
-		public boolean keyDown(final int keycode) {
+		public boolean keyUp(final int keycode) {
 			if (keycode == Keys.M) {
 				toggleBackgroundMusic();
 				return true;
 			}
-			return super.keyDown(keycode);
+			if (keycode == Keys.ESCAPE) {
+				Gdx.app.exit();
+			}
+			return super.keyUp(keycode);
 		}
 
 
@@ -93,7 +95,7 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		setBackgroundMusic("Music.mp3");
 		setTextMargin(10.0f);
 
-		addInputProcessor(_toggleBackgroundMusicInputProcessor);
+		addInputProcessor(_inputProcessor);
 
 		for (final LocalTank tank : _model.getModel().getLocalLocalTanks()) {
 			tank.getPlayerConfig().initActions(this);
@@ -102,10 +104,6 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	@Override
 	protected void renderInternal(final float pDeltaTimeSeconds) {
-		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
-
 		paintFrame();
 
 		_tanksLogic.update(getTimeMillis(), pDeltaTimeSeconds);

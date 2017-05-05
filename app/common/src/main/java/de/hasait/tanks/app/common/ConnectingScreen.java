@@ -21,6 +21,8 @@ import java.util.concurrent.Future;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -36,6 +38,19 @@ import de.hasait.tanks.util.common.Util;
  */
 public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 
+	private final InputProcessor _inputProcessor = new InputAdapter() {
+
+		@Override
+		public boolean keyUp(final int keycode) {
+			if (keycode == Input.Keys.ESCAPE) {
+				Gdx.app.exit();
+			}
+			return super.keyUp(keycode);
+		}
+
+
+	};
+
 	private final GameConfig _config;
 
 	private final DistributedModel _model;
@@ -49,6 +64,8 @@ public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		setBackgroundColor(new Color(0.0f, 0.2f, 0.0f, 1.0f));
 
+		addInputProcessor(_inputProcessor);
+
 		final Label titleLabel = createLabel("Connecting...", 2.0f);
 
 		final Table layout = addLayout();
@@ -59,10 +76,6 @@ public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	@Override
 	protected void renderInternal(final float pDelta) {
-		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
-
 		if (_connect == null) {
 			_connect = Util.EXECUTOR_SERVICE
 					.submit(() -> _model.connect(_config.getRoomName(), _config.getWishPiecesX(), _config.getWishPiecesY()));

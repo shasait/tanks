@@ -16,6 +16,11 @@
 
 package de.hasait.tanks.util.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Base64;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,6 +65,29 @@ public final class Util {
 			sb.append(pText);
 		}
 		return sb.toString();
+	}
+
+	public static Object serializeFromString(final String pString) {
+		try {
+			final byte[] bytes = Base64.getDecoder().decode(pString);
+			final ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
+			return ois.readObject();
+		} catch (final Exception pE) {
+			throw new RuntimeException(pE);
+		}
+	}
+
+	public static String serializeToString(final Object pObject) {
+		try {
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			final ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(pObject);
+			oos.close();
+			final byte[] bytes = baos.toByteArray();
+			return Base64.getEncoder().encodeToString(bytes);
+		} catch (final Exception pE) {
+			throw new RuntimeException(pE);
+		}
 	}
 
 	private Util() {

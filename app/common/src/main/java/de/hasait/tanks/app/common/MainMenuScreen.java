@@ -25,6 +25,9 @@ import java.util.function.Supplier;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -48,6 +51,22 @@ import de.hasait.tanks.util.common.input.GdxInputKeyPressedAction;
  */
 public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
+	private static final String PREFKEY__ROOM_NAME = "roomName";
+	private static final String PREFKEY__PLAYER_CONFIG = "playerConfig";
+
+	private final InputProcessor _inputProcessor = new InputAdapter() {
+
+		@Override
+		public boolean keyUp(final int keycode) {
+			if (keycode == Input.Keys.ESCAPE) {
+				Gdx.app.exit();
+			}
+			return super.keyUp(keycode);
+		}
+
+
+	};
+
 	private final AtomicReference<ConfiguredActionFactory> _configuredActionFactory = new AtomicReference<>();
 
 	private final TextField _roomNameField;
@@ -60,6 +79,8 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		setBackgroundColor(new Color(0.0f, 0.0f, 0.2f, 1.0f));
 
+		addInputProcessor(_inputProcessor);
+
 		final Table layout = addLayout();
 		layout.setFillParent(true);
 		layout.defaults().pad(5.0f).align(Align.left).fill();
@@ -67,29 +88,42 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		final Label titleLabel = createLabel("Welcome to Tanks", 2.0f);
 		layout.add(titleLabel).colspan(2).padBottom(20.0f);
 
+		final Preferences preferences = obtainPreferences();
+
 		layout.row();
 		layout.add(createLabel("Room"));
-		_roomNameField = createTextField("Default");
+		_roomNameField = createTextField(preferences.getString(PREFKEY__ROOM_NAME, "Default"));
 		layout.add(_roomNameField);
 
 		for (int i = 0; i < 2; i++) {
 			layout.row();
 			layout.add(createLabel("Player " + (i + 1)));
 			final TextField playerNameField = createTextField();
-			if (i == 0) {
-				playerNameField.setText("Player " + (i + 1));
-			}
 			layout.add(playerNameField);
 			_playerNameFields.add(playerNameField);
-			final PlayerConfig playerConfig = new PlayerConfig();
+			PlayerConfig playerConfig = null;
+			final String preferencesString = preferences.getString(PREFKEY__PLAYER_CONFIG + i);
+			if (!Util.isEmpty(preferencesString)) {
+				try {
+					playerConfig = (PlayerConfig) Util.serializeFromString(preferencesString);
+					Gdx.app.log("PlayerConfig", "Read for player " + i);
+				} catch (final RuntimeException pE) {
+					Gdx.app.error("PlayerConfig", "Cannot read for player " + i, pE);
+				}
+			}
+			if (playerConfig == null) {
+				Gdx.app.log("PlayerConfig", "New for player " + i);
+				playerConfig = new PlayerConfig();
+				if (i == 0) {
+					playerConfig.setName("Player " + (i + 1));
+					setActionSet1(playerConfig);
+				} else if (i == 1) {
+					setActionSet2(playerConfig);
+				}
+			}
+			playerNameField.setText(playerConfig.getName());
 			playerNameField.setUserObject(playerConfig);
 
-			if (i == 0) {
-				setActionSet1(playerConfig);
-			}
-			if (i == 1) {
-				setActionSet2(playerConfig);
-			}
 
 			layout.add(actionConfig("Fire", playerConfig::getFire, playerConfig::setFire));
 			layout.row();
@@ -120,13 +154,12 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	@Override
 	protected void renderInternal(final float pDelta) {
-		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
-
 		final ConfiguredActionFactory configuredActionFactory = _configuredActionFactory.get();
-		if (configuredActionFactory != null && configuredActionFactory.isFinished()) {
-			_configuredActionFactory.set(null);
+		if (configuredActionFactory != null) {
+			drawText(0, ">>> Waiting for action <<<", AlignH.CENTER, AlignV.TOP);
+			if (configuredActionFactory.isFinished()) {
+				_configuredActionFactory.set(null);
+			}
 		}
 
 		if (_connect) {
@@ -137,20 +170,33 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 				return;
 			}
 
-			final GameConfig config = new GameConfig(roomName, 40, 24);
-			for (final TextField playerNameField : _playerNameFields) {
+			final Preferences preferences = obtainPreferences();
+			preferences.putString(PREFKEY__ROOM_NAME, roomName);
+
+			final GameConfig config = new GameConfig();
+			config.setRoomName(roomName);
+			config.setWishPiecesX(40);
+			config.setWishPiecesY(24);
+
+			for (int i = 0; i < _playerNameFields.size(); i++) {
+				final TextField playerNameField = _playerNameFields.get(i);
 				final String playerName = playerNameField.getText();
 				if (Util.isBlank(playerName)) {
 					continue;
 				}
+
 				final PlayerConfig playerConfig = (PlayerConfig) playerNameField.getUserObject();
 				playerConfig.setName(playerName.trim());
 				config.getPlayers().add(playerConfig);
+
+				preferences.putString(PREFKEY__PLAYER_CONFIG + i, Util.serializeToString(playerConfig));
 			}
 
 			if (config.getPlayers().isEmpty()) {
 				return;
 			}
+
+			preferences.flush();
 
 			setScreen(new ConnectingScreen(getContext(), config));
 		}
@@ -172,6 +218,10 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 			}
 		});
 		return label;
+	}
+
+	private Preferences obtainPreferences() {
+		return Gdx.app.getPreferences("tanks-config");
 	}
 
 	private void setActionSet1(final PlayerConfig pPlayerConfig) {

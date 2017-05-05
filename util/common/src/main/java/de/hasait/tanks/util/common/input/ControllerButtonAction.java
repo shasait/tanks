@@ -28,43 +28,43 @@ import de.hasait.tanks.util.common.AbstractConfiguredAction;
 /**
  *
  */
-public class ControllerAxisMoveAction extends AbstractConfiguredAction {
+public class ControllerButtonAction extends AbstractConfiguredAction {
 
 	private final String _controllerName;
-	private final int _axisIndex;
-	private final boolean _positive;
+	private final int _buttonIndex;
 
 	private final ControllerListener _listener = new ControllerAdapter() {
 
 		@Override
-		public boolean axisMoved(final Controller pController, final int pAxisIndex, final float pValue) {
-			if (_controllerName.equals(pController.getName()) && _axisIndex == pAxisIndex) {
-				if (_positive && pValue > 0.2f) {
-					updateState(pValue);
-					return true;
-				}
-				if (!_positive && pValue < -0.2f) {
-					updateState(-pValue);
-					return true;
-				}
+		public boolean buttonDown(final Controller pController, final int pButtonIndex) {
+			if (_controllerName.equals(pController.getName()) && _buttonIndex == pButtonIndex) {
+				updateState(1.0f);
+				return true;
 			}
+			return super.buttonDown(pController, pButtonIndex);
+		}
 
-			return super.axisMoved(pController, pAxisIndex, pValue);
+		@Override
+		public boolean buttonUp(final Controller pController, final int pButtonIndex) {
+			if (_controllerName.equals(pController.getName()) && _buttonIndex == pButtonIndex) {
+				updateState(0.0f);
+				return true;
+			}
+			return super.buttonUp(pController, pButtonIndex);
 		}
 
 	};
 
-	public ControllerAxisMoveAction(final String pControllerName, final int pAxisIndex, final boolean pPositive) {
+	public ControllerButtonAction(final String pControllerName, final int pButtonIndex) {
 		super();
 
 		_controllerName = pControllerName;
-		_axisIndex = pAxisIndex;
-		_positive = pPositive;
+		_buttonIndex = pButtonIndex;
 	}
 
 	@Override
 	public String toString() {
-		return (_positive ? "+" : "-") + "Axis " + _axisIndex;
+		return  "Button " + _buttonIndex;
 	}
 
 	@Override
@@ -78,10 +78,9 @@ public class ControllerAxisMoveAction extends AbstractConfiguredAction {
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		final ControllerAxisMoveActionSerialized serialized = new ControllerAxisMoveActionSerialized();
+		final ControllerButtonActionSerialized serialized = new ControllerButtonActionSerialized();
 		serialized._controllerName = _controllerName;
-		serialized._axisIndex = _axisIndex;
-		serialized._positive = _positive;
+		serialized._buttonIndex = _buttonIndex;
 		return serialized;
 	}
 
