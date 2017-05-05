@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>de.hasait.tanks</groupId>
 		<artifactId>tanks.aggregator</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.2.RC1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
