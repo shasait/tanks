@@ -16,17 +16,9 @@
 
 package de.hasait.tanks.app.common.model;
 
-import java.io.ObjectStreamException;
-
 /**
  *
  */
-public class BulletSerialized extends AbstractMovableGameObjectSerialized<BulletState> {
-
-	public String _tankUuid;
-
-	private Object readResolve() throws ObjectStreamException {
-		return new Bullet(_ownerAddress, _width, _height, _tankUuid, _state);
-	}
+public abstract class AbstractMovableGameObjectSerialized<S extends AbstractState<S>> extends AbstractGameObjectSerialized<S> {
 
 }

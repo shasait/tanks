@@ -24,10 +24,12 @@ import java.util.Optional;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 
+import de.hasait.tanks.app.common.model.AbstractGameObject;
 import de.hasait.tanks.app.common.model.Bullet;
 import de.hasait.tanks.app.common.model.BulletState;
-import de.hasait.tanks.app.common.model.DistributedModel;
+import de.hasait.tanks.app.common.model.DistributedWorld;
 import de.hasait.tanks.app.common.model.LocalTank;
+import de.hasait.tanks.app.common.model.Obstacle;
 import de.hasait.tanks.app.common.model.Rules;
 import de.hasait.tanks.app.common.model.Tank;
 import de.hasait.tanks.app.common.model.TankState;
@@ -38,39 +40,43 @@ import de.hasait.tanks.app.common.msg.UpdateMsg;
  */
 public class TanksLogic {
 
-	private final DistributedModel _model;
+	private final DistributedWorld _world;
 	private final Callback _callback;
 
-	public TanksLogic(final DistributedModel pModel, final Callback pCallback) {
+	public TanksLogic(final DistributedWorld pWorld, final Callback pCallback) {
 		super();
 
-		_model = pModel;
+		_world = pWorld;
 		_callback = pCallback;
 	}
 
 	public Collection<Bullet> getBullets() {
-		return _model.getModel().getBullets();
+		return _world.getWorld().getBullets();
 	}
 
 	public Collection<LocalTank> getLocalLocalTanks() {
-		return _model.getModel().getLocalLocalTanks();
+		return _world.getWorld().getLocalLocalTanks();
 	}
 
 	public Collection<Tank> getLocalTanks() {
-		return _model.getModel().getLocalTanks();
+		return _world.getWorld().getLocalTanks();
+	}
+
+	public Collection<Obstacle> getObstacles() {
+		return _world.getWorld().getObstacles();
 	}
 
 	public Rules getRules() {
-		return _model.getModel().getRules();
+		return _world.getWorld().getRules();
 	}
 
 	public Collection<Tank> getTanks() {
-		return _model.getModel().getTanks();
+		return _world.getWorld().getTanks();
 	}
 
 	public void update(final long pTimeMillis, final float pDeltaTimeSeconds) {
 		for (final LocalTank localTank : getLocalLocalTanks()) {
-			final Optional<Tank> optionalTank = _model.getModel().getTank(localTank.getTankUuid());
+			final Optional<Tank> optionalTank = _world.getWorld().getTank(localTank.getTankUuid());
 			if (!optionalTank.isPresent()) {
 				// not yet received via network
 				continue;
@@ -89,16 +95,16 @@ public class TanksLogic {
 			}
 
 			if (!updateMsg.isEmpty()) {
-				_model.networkSend(updateMsg);
+				_world.networkSend(updateMsg);
 			}
 		}
 	}
 
-	private Map<Tank, Float> determineIntersections(final Tank pTank, final TankState pTankState) {
+	private Map<AbstractGameObject<?>, Float> determineIntersections(final Tank pTank, final TankState pTankState) {
 		final Polygon bounds = pTankState == null ? pTank.getBounds() : pTank.createBounds(pTankState);
 		final float whDist2 = pTank.getWhDist2();
 
-		final Map<Tank, Float> intersections = new HashMap<>();
+		final Map<AbstractGameObject<?>, Float> intersections = new HashMap<>();
 		for (final Tank otherTank : getTanks()) {
 			if (pTank == otherTank) {
 				continue;
@@ -106,6 +112,12 @@ public class TanksLogic {
 			final Float distanceIfIntersects = otherTank.intersects(bounds, whDist2);
 			if (distanceIfIntersects != null) {
 				intersections.put(otherTank, distanceIfIntersects);
+			}
+		}
+		for (final Obstacle obstacle : getObstacles()) {
+			final Float distanceIfIntersects = obstacle.intersects(bounds, whDist2);
+			if (distanceIfIntersects != null) {
+				intersections.put(obstacle, distanceIfIntersects);
 			}
 		}
 		return intersections;
@@ -133,8 +145,8 @@ public class TanksLogic {
 			newTankState._damage = 0;
 			newTankState._spawnAtMillis = null;
 			while (true) {
-				newTankState._centerX = MathUtils.random() * _model.getModel().getWorldW();
-				newTankState._centerY = MathUtils.random() * _model.getModel().getWorldH();
+				newTankState._centerX = MathUtils.random() * _world.getWorld().getWorldW();
+				newTankState._centerY = MathUtils.random() * _world.getWorld().getWorldH();
 				newTankState._rotation = MathUtils.random() * 360.0f;
 				if (determineIntersections(pUpdateContext._tank, newTankState).isEmpty()) {
 					break;
@@ -146,7 +158,7 @@ public class TanksLogic {
 	private void updateBullets(final UpdateContext pUpdateContext) {
 		final TankState newTankState = pUpdateContext._newTankState;
 		final UpdateMsg updateMsg = pUpdateContext._updateMsg;
-		final float speed = pUpdateContext._deltaTimeSeconds * _model.getModel().getBulletSpeed();
+		final float speed = pUpdateContext._deltaTimeSeconds * _world.getWorld().getBulletSpeed();
 
 		for (final Bullet bullet : getBullets()) {
 			if (!pUpdateContext._tank.isMyBullet(bullet)) {
@@ -159,7 +171,7 @@ public class TanksLogic {
 
 			boolean removeBullet = false;
 
-			if (!_model.getModel().worldContains(newBulletState._centerX, newBulletState._centerY)) {
+			if (!_world.getWorld().worldContains(newBulletState._centerX, newBulletState._centerY)) {
 				removeBullet = true;
 			} else {
 				for (final Tank tank : getTanks()) {
@@ -171,6 +183,11 @@ public class TanksLogic {
 						updateMsg._incrementDamage.add(tank.getUuid());
 						pUpdateContext._tankDirty = true;
 						newTankState._points++;
+					}
+				}
+				for (final Obstacle obstacle : getObstacles()) {
+					if (obstacle.contains(newBulletState._centerX, newBulletState._centerY)) {
+						removeBullet = true;
 					}
 				}
 			}
@@ -187,7 +204,7 @@ public class TanksLogic {
 		final LocalTank localTank = pUpdateContext._localTank;
 		final Tank tank = pUpdateContext._tank;
 		final TankState newTankState = pUpdateContext._newTankState;
-		final float speed = pUpdateContext._deltaTimeSeconds * _model.getModel().getTankSpeed();
+		final float speed = pUpdateContext._deltaTimeSeconds * _world.getWorld().getTankSpeed();
 
 		final TankActions tankActions = new TankActions();
 		localTank.getPlayerConfig().fillActions(tankActions);
@@ -201,11 +218,11 @@ public class TanksLogic {
 			moveSpeed -= tankActions._moveBackward * speed;
 		}
 		if (moveSpeed != 0.0f) {
-			final Map<Tank, Float> beforeIntersections = determineIntersections(tank, null);
+			final Map<AbstractGameObject<?>, Float> beforeIntersections = determineIntersections(tank, null);
 			tank.move(moveSpeed, newTankState);
-			final Map<Tank, Float> afterIntersections = determineIntersections(tank, newTankState);
+			final Map<AbstractGameObject<?>, Float> afterIntersections = determineIntersections(tank, newTankState);
 			boolean validMove = true;
-			for (final Map.Entry<Tank, Float> afterEntry : afterIntersections.entrySet()) {
+			for (final Map.Entry<AbstractGameObject<?>, Float> afterEntry : afterIntersections.entrySet()) {
 				final Float afterDistance = afterEntry.getValue();
 				final Float beforeDistance = beforeIntersections.get(afterEntry.getKey());
 				if (beforeDistance == null || afterDistance < beforeDistance) {
@@ -227,11 +244,11 @@ public class TanksLogic {
 		if (newTankState._centerY < 0) {
 			newTankState._centerY = 0;
 		}
-		if (newTankState._centerX > _model.getModel().getWorldW()) {
-			newTankState._centerX = _model.getModel().getWorldW();
+		if (newTankState._centerX > _world.getWorld().getWorldW()) {
+			newTankState._centerX = _world.getWorld().getWorldW();
 		}
-		if (newTankState._centerY > _model.getModel().getWorldH()) {
-			newTankState._centerY = _model.getModel().getWorldH();
+		if (newTankState._centerY > _world.getWorld().getWorldH()) {
+			newTankState._centerY = _world.getWorld().getWorldH();
 		}
 
 		float rotationSpeed = 0.0f;
@@ -262,7 +279,7 @@ public class TanksLogic {
 			if (newTankState._spawnAtMillis == null
 					&& pUpdateContext._timeMillis - localTank.getLastShotTimeMillis() > getRules()._timeMillisBetweenShots) {
 				localTank.setLastShotTimeMillis(pUpdateContext._timeMillis);
-				_model.createBullet(tank);
+				_world.createBullet(tank);
 				_callback.onSpawnBullet();
 			}
 		}

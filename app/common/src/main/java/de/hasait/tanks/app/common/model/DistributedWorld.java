@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 import org.jgroups.Address;
@@ -41,14 +42,14 @@ import de.hasait.tanks.app.common.msg.UpdateMsg;
 /**
  *
  */
-public class DistributedModel implements Disposable {
+public class DistributedWorld implements Disposable {
 
 	private final Set<Address> _channelMembers = new HashSet<>();
 
 	private final AtomicReference<JChannel> _channel = new AtomicReference<>();
-	private final AtomicReference<Model> _model = new AtomicReference<>();
+	private final AtomicReference<World> _world = new AtomicReference<>();
 
-	public DistributedModel() {
+	public DistributedWorld() {
 		super();
 	}
 
@@ -70,9 +71,9 @@ public class DistributedModel implements Disposable {
 				@Override
 				public void getState(final OutputStream pOutput) throws Exception {
 					try (final ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(pOutput, 1024))) {
-						oos.writeInt(getModel().getPiecesX());
-						oos.writeInt(getModel().getPiecesY());
-						oos.writeObject(getModel().getSharedState());
+						oos.writeInt(getWorld().getPiecesX());
+						oos.writeInt(getWorld().getPiecesY());
+						oos.writeObject(getWorld().getSharedState());
 					}
 				}
 
@@ -85,17 +86,17 @@ public class DistributedModel implements Disposable {
 				@Override
 				public void setState(final InputStream pInput) throws Exception {
 					try (final ObjectInputStream ois = new ObjectInputStream(pInput)) {
-						initModel(new Model(ois.readInt(), ois.readInt()));
+						initWorld(new World(ois.readInt(), ois.readInt()));
 						//noinspection unchecked
-						((Iterable<Object>) ois.readObject()).forEach(DistributedModel.this::networkReceive);
+						((Iterable<Object>) ois.readObject()).forEach(DistributedWorld.this::networkReceive);
 					}
 				}
 
 				@Override
 				public void viewAccepted(final View pView) {
 					final List<Address> members = pView.getMembers();
-					if (!hasModel() && members.size() == 1) {
-						initModel(new Model(pWishPiecesX, pWishPiecesY));
+					if (!hasWorld() && members.size() == 1) {
+						initWorld(new World(pWishPiecesX, pWishPiecesY));
 					}
 					final Iterator<Address> entryI = _channelMembers.iterator();
 					while (entryI.hasNext()) {
@@ -105,16 +106,16 @@ public class DistributedModel implements Disposable {
 							entryI.remove();
 							final Predicate<AbstractGameObject<?>> addressStringPredicate = pObject -> pObject.getOwnerAddress()
 																											  .equals(addressString);
-							getModel().removeTanks(addressStringPredicate);
-							getModel().removeBullets(addressStringPredicate);
+							getWorld().removeTanks(addressStringPredicate);
+							getWorld().removeBullets(addressStringPredicate);
 						}
 					}
 					_channelMembers.addAll(members);
 				}
 
-				private void initModel(final Model pModel) {
-					if (!_model.compareAndSet(null, pModel)) {
-						throw new IllegalStateException("Model exists!?");
+				private void initWorld(final World pWorld) {
+					if (!_world.compareAndSet(null, pWorld)) {
+						throw new IllegalStateException("World exists!?");
 					}
 				}
 			});
@@ -128,19 +129,30 @@ public class DistributedModel implements Disposable {
 	public void createBullet(final Tank pTank) {
 		final JChannel channel = getChannelNotNull();
 		final TankState state = pTank.getState();
-		final Bullet bullet = new Bullet(channel.getAddressAsString(), pTank.getUuid(), state._centerX, state._centerY,
-										 state._rotation + state._turretRotation
+		final Bullet bullet = new Bullet(channel.getAddressAsString(), getWorld().getBulletW(), getWorld().getBulletH(), pTank.getUuid(),
+										 state._centerX, state._centerY, state._rotation + state._turretRotation
 		);
 		networkSend(bullet);
 	}
 
+	public void createObstacle() {
+		final JChannel channel = getChannelNotNull();
+		final Obstacle obstacle = new Obstacle(channel.getAddressAsString(),
+											   (int) (getWorld().getObstacleW() * MathUtils.random(1.0f, 3.0f)),
+											   (int) (getWorld().getObstacleH() * MathUtils.random(1.0f, 3.0f)),
+											   getWorld().getWorldW() * MathUtils.random(), getWorld().getWorldH() * MathUtils.random(),
+											   360.0f * MathUtils.random()
+		);
+		networkSend(obstacle);
+	}
+
 	public void createTank(final PlayerConfig pPlayerConfig) {
 		final JChannel channel = getChannelNotNull();
-		final Tank tank = new Tank(channel.getAddressAsString(), pPlayerConfig.getName(), getModel().getTankW(), getModel().getTankH(),
-								   TimeUtils.millis() + getModel().getRules()._spawnTimeMillis
+		final Tank tank = new Tank(channel.getAddressAsString(), getWorld().getTankW(), getWorld().getTankH(), pPlayerConfig.getName(),
+								   TimeUtils.millis() + getWorld().getRules()._spawnTimeMillis
 		);
 		final LocalTank localTank = new LocalTank(tank.getUuid(), pPlayerConfig);
-		getModel().addLocalTank(localTank);
+		getWorld().addLocalTank(localTank);
 		networkSend(tank);
 	}
 
@@ -150,19 +162,19 @@ public class DistributedModel implements Disposable {
 		if (channel != null) {
 			channel.close();
 		}
-		_model.getAndSet(null);
+		_world.getAndSet(null);
 	}
 
-	public Model getModel() {
-		final Model model = _model.get();
-		if (model == null) {
-			throw new IllegalStateException("No model");
+	public World getWorld() {
+		final World world = _world.get();
+		if (world == null) {
+			throw new IllegalStateException("No world");
 		}
-		return model;
+		return world;
 	}
 
-	public boolean hasModel() {
-		return _model.get() != null;
+	public boolean hasWorld() {
+		return _world.get() != null;
 	}
 
 	public void networkSend(final Object pObject) {
@@ -186,29 +198,33 @@ public class DistributedModel implements Disposable {
 		if (pReceived instanceof UpdateMsg) {
 			final UpdateMsg dirty = (UpdateMsg) pReceived;
 			for (final TankState tankState : dirty._tanks) {
-				getModel().apply(tankState);
+				getWorld().apply(tankState);
 			}
 			for (final BulletState bulletState : dirty._bullets) {
-				getModel().apply(bulletState);
+				getWorld().apply(bulletState);
 			}
 			for (final String bulletUuid : dirty._removedBullets) {
-				getModel().removeBullet(bulletUuid);
+				getWorld().removeBullet(bulletUuid);
 			}
 			for (final String tankUuid : dirty._incrementDamage) {
-				getModel().getLocalTank(tankUuid).ifPresent(LocalTank::incrementDamageIncrement);
+				getWorld().getLocalTank(tankUuid).ifPresent(LocalTank::incrementDamageIncrement);
 			}
+		}
+		if (pReceived instanceof Obstacle) {
+			final Obstacle obstacle = (Obstacle) pReceived;
+			getWorld().addObstacle(obstacle);
 		}
 		if (pReceived instanceof Tank) {
 			final Tank tank = (Tank) pReceived;
-			getModel().addTank(tank);
+			getWorld().addTank(tank);
 		}
 		if (pReceived instanceof Bullet) {
 			final Bullet bullet = (Bullet) pReceived;
-			getModel().addBullet(bullet);
+			getWorld().addBullet(bullet);
 		}
 		if (pReceived instanceof Rules) {
 			final Rules rules = (Rules) pReceived;
-			getModel().setRules(rules);
+			getWorld().setRules(rules);
 		}
 	}
 

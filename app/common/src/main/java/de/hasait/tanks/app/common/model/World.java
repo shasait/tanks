@@ -33,7 +33,7 @@ import com.badlogic.gdx.math.Rectangle;
 /**
  *
  */
-public class Model {
+public class World {
 
 	private final int _piecesX, _piecesY;
 	private final int _worldW, _worldH;
@@ -41,18 +41,20 @@ public class Model {
 	private final int _tankW, _tankH;
 	private final int _turretW, _turretH;
 	private final int _bulletW, _bulletH;
+	private final int _obstacleW, _obstacleH;
 	private final float _tankSpeed;
 	private final float _bulletSpeed;
 
+	private final AtomicReference<Rules> _rules = new AtomicReference<>(new Rules());
+
 	private final Map<String, Tank> _tanks = new ConcurrentHashMap<>();
 	private final Map<String, Bullet> _bullets = new ConcurrentHashMap<>();
-
-	private final AtomicReference<Rules> _rules = new AtomicReference<>(new Rules());
+	private final Map<String, Obstacle> _obstacles = new ConcurrentHashMap<>();
 
 	private final Map<String, LocalTank> _localLocalTanks = new HashMap<>();
 	private final Map<String, Tank> _localTanks = new HashMap<>();
 
-	public Model(final int pPiecesX, final int pPiecesY) {
+	public World(final int pPiecesX, final int pPiecesY) {
 		super();
 
 		_piecesX = pPiecesX;
@@ -63,6 +65,8 @@ public class Model {
 		_turretH = _tankH * 3 / 4;
 		_bulletW = _tankW / 4;
 		_bulletH = _tankH / 3;
+		_obstacleW = _tankW;
+		_obstacleH = _tankH;
 		_worldW = _piecesX * _tankW;
 		_worldH = _piecesY * _tankH;
 		_worldR = new Rectangle(0, 0, _worldW, _worldH);
@@ -81,6 +85,10 @@ public class Model {
 		if (tank != null) {
 			_localTanks.putIfAbsent(tankUuid, tank);
 		}
+	}
+
+	public void addObstacle(final Obstacle pObstacle) {
+		_obstacles.putIfAbsent(pObstacle.getUuid(), pObstacle);
 	}
 
 	public void addTank(final Tank pTank) {
@@ -135,6 +143,18 @@ public class Model {
 		return Collections.unmodifiableCollection(_localTanks.values());
 	}
 
+	public int getObstacleH() {
+		return _obstacleH;
+	}
+
+	public int getObstacleW() {
+		return _obstacleW;
+	}
+
+	public Collection<Obstacle> getObstacles() {
+		return Collections.unmodifiableCollection(_obstacles.values());
+	}
+
 	public int getPiecesX() {
 		return _piecesX;
 	}
@@ -150,6 +170,7 @@ public class Model {
 	public List<Object> getSharedState() {
 		// Only add objects shared on all network nodes (eg. not LocalTanks)
 		final List<Object> objects = new ArrayList<>();
+		objects.addAll(_obstacles.values());
 		objects.addAll(_tanks.values());
 		objects.addAll(_bullets.values());
 		objects.add(getRules());

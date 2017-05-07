@@ -24,9 +24,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
-import de.hasait.tanks.app.common.model.Bullet;
-import de.hasait.tanks.app.common.model.BulletState;
-import de.hasait.tanks.app.common.model.DistributedModel;
+import de.hasait.tanks.app.common.model.AbstractGameObject;
+import de.hasait.tanks.app.common.model.AbstractState;
+import de.hasait.tanks.app.common.model.DistributedWorld;
 import de.hasait.tanks.app.common.model.LocalTank;
 import de.hasait.tanks.app.common.model.Tank;
 import de.hasait.tanks.app.common.model.TankState;
@@ -62,31 +62,27 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		}
 	};
 
-	private final DistributedModel _model;
+	private final DistributedWorld _world;
 	private final TanksLogic _tanksLogic;
 
-	private Texture _bulletImage;
-	private Texture _tankImage;
-	private Texture _turretImage;
+	private Texture _tankTexture;
+	private Texture _turretTexture;
+	private Texture _bulletTexture;
+	private Texture _rockTexture;
 	private Sound _shotSound;
 
 
-	public GameScreen(final TanksScreenContext pContext, final DistributedModel pModel) {
-		super(pContext, pModel.getModel().getWorldW(), pModel.getModel().getWorldH());
+	public GameScreen(final TanksScreenContext pContext, final DistributedWorld pWorld) {
+		super(pContext, pWorld.getWorld().getWorldW(), pWorld.getWorld().getWorldH());
 
-		_model = pModel;
-		addDisposable(_model);
-		_tanksLogic = new TanksLogic(_model, _callback);
+		_world = pWorld;
+		addDisposable(_world);
+		_tanksLogic = new TanksLogic(_world, _callback);
 
-		_bulletImage = new Texture(Gdx.files.internal("Bullet.png"), true);
-		addDisposable(_bulletImage);
-		_bulletImage.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
-		_tankImage = new Texture(Gdx.files.internal("Tank.png"), true);
-		addDisposable(_tankImage);
-		_tankImage.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
-		_turretImage = new Texture(Gdx.files.internal("GunTurret.png"), true);
-		addDisposable(_turretImage);
-		_turretImage.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
+		_tankTexture = loadTexture("Tank.png");
+		_turretTexture = loadTexture("Turret.png");
+		_bulletTexture = loadTexture("Bullet.png");
+		_rockTexture = loadTexture("Rock.png");
 
 		_shotSound = Gdx.audio.newSound(Gdx.files.internal("Shot.wav"));
 		addDisposable(_shotSound);
@@ -97,7 +93,7 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 
 		addInputProcessor(_inputProcessor);
 
-		for (final LocalTank tank : _model.getModel().getLocalLocalTanks()) {
+		for (final LocalTank tank : _world.getWorld().getLocalLocalTanks()) {
 			tank.getPlayerConfig().initActions(this);
 		}
 	}
@@ -138,23 +134,26 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 	private void paintFrame() {
 		_tanksLogic.getLocalTanks().forEach(pTank -> drawTankStatusText(pTank, true, false));
 
-		for (final Bullet bullet : _tanksLogic.getBullets()) {
-			final BulletState state = bullet.getState();
-			drawTexture(_bulletImage, state._centerX, state._centerY, _model.getModel().getBulletW(), _model.getModel().getBulletH(),
-						state._rotation
-			);
-		}
+		_tanksLogic.getObstacles().forEach(pObstacle -> paintGameObject(pObstacle, _rockTexture));
+		_tanksLogic.getBullets().forEach(pBullet -> paintGameObject(pBullet, _bulletTexture));
+
 		for (final Tank tank : _tanksLogic.getTanks()) {
 			final TankState state = drawTankStatusText(tank, false, true);
 			if (state._spawnAtMillis == null) {
-				drawTexture(_tankImage, state._centerX, state._centerY, _model.getModel().getTankW(), _model.getModel().getTankH(),
-							state._rotation
-				);
-				drawTexture(_turretImage, state._centerX, state._centerY, _model.getModel().getTurretW(), _model.getModel().getTurretH(),
+				paintGameObject(tank, state, _tankTexture);
+				drawTexture(_turretTexture, state._centerX, state._centerY, _world.getWorld().getTurretW(), _world.getWorld().getTurretH(),
 							state._rotation + state._turretRotation
 				);
 			}
 		}
+	}
+
+	private <S extends AbstractState<S>> void paintGameObject(final AbstractGameObject<S> pGameObject, final Texture pTexture) {
+		paintGameObject(pGameObject, pGameObject.getState(), pTexture);
+	}
+
+	private <S extends AbstractState<S>> void paintGameObject(final AbstractGameObject<S> pGameObject, final S pState, final Texture pTexture) {
+		drawTexture(pTexture, pState._centerX, pState._centerY, pGameObject.getWidth(), pGameObject.getHeight(), pState._rotation);
 	}
 
 }

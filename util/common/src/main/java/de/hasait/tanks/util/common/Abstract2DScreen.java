@@ -262,6 +262,13 @@ public abstract class Abstract2DScreen<C extends AbstractScreenContext> implemen
 		return _backgroundMusicPlaying;
 	}
 
+	protected final Texture loadTexture(final String pPath) {
+		final Texture texture = new Texture(Gdx.files.internal(pPath), true);
+		texture.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
+		addDisposable(texture);
+		return texture;
+	}
+
 	protected abstract void renderInternal(final float pDelta);
 
 	protected final void setBackgroundColor(final Color pBackgroundColor) {

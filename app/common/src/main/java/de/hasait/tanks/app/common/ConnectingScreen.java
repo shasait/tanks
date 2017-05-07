@@ -27,7 +27,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import de.hasait.tanks.app.common.model.DistributedModel;
+import de.hasait.tanks.app.common.model.DistributedWorld;
 import de.hasait.tanks.app.common.model.GameConfig;
 import de.hasait.tanks.app.common.model.PlayerConfig;
 import de.hasait.tanks.util.common.Abstract2DScreen;
@@ -53,14 +53,14 @@ public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	private final GameConfig _config;
 
-	private final DistributedModel _model;
+	private final DistributedWorld _world;
 	private Future<?> _connect;
 
 	public ConnectingScreen(final TanksScreenContext pContext, final GameConfig pConfig) {
 		super(pContext, 800, 600);
 
 		_config = pConfig;
-		_model = new DistributedModel();
+		_world = new DistributedWorld();
 
 		setBackgroundColor(new Color(0.0f, 0.2f, 0.0f, 1.0f));
 
@@ -78,12 +78,15 @@ public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 	protected void renderInternal(final float pDelta) {
 		if (_connect == null) {
 			_connect = Util.EXECUTOR_SERVICE
-					.submit(() -> _model.connect(_config.getRoomName(), _config.getWishPiecesX(), _config.getWishPiecesY()));
-		} else if (_connect.isDone() && _model.hasModel()) {
+					.submit(() -> _world.connect(_config.getRoomName(), _config.getWishPiecesX(), _config.getWishPiecesY()));
+		} else if (_connect.isDone() && _world.hasWorld()) {
 			for (final PlayerConfig playerConfig : _config.getPlayers()) {
-				_model.createTank(playerConfig);
+				for (int i = 0; i < 2; i++) {
+					_world.createObstacle();
+				}
+				_world.createTank(playerConfig);
 			}
-			setScreen(new GameScreen(getContext(), _model));
+			setScreen(new GameScreen(getContext(), _world));
 		}
 	}
 

@@ -22,10 +22,10 @@ import java.util.UUID;
 /**
  *
  */
-public class Bullet extends AbstractMovableGameObject<BulletState> {
+public class Obstacle extends AbstractGameObject<ObstacleState> {
 
-	private static BulletState createState(final float pCenterX, final float pCenterY, final float pRotation) {
-		final BulletState state = new BulletState();
+	private static ObstacleState createState(final float pCenterX, final float pCenterY, final float pRotation) {
+		final ObstacleState state = new ObstacleState();
 		state._uuid = UUID.randomUUID().toString();
 		state._centerX = pCenterX;
 		state._centerY = pCenterY;
@@ -33,28 +33,19 @@ public class Bullet extends AbstractMovableGameObject<BulletState> {
 		return state;
 	}
 
-	private final String _tankUuid;
-
-	public Bullet(final String pOwnerAddress, final int pWidth, final int pHeight, final String pTankUuid, final BulletState pState) {
+	public Obstacle(final String pOwnerAddress, final int pWidth, final int pHeight, final ObstacleState pState) {
 		super(pOwnerAddress, pWidth, pHeight);
-
-		_tankUuid = pTankUuid;
 
 		apply(pState);
 	}
 
-	public Bullet(final String pOwnerAddress, final int pWidth, final int pHeight, final String pTankUuid, final float pCenterX, final float pCenterY, final float pRotation) {
-		this(pOwnerAddress, pWidth, pHeight, pTankUuid, createState(pCenterX, pCenterY, pRotation));
-	}
-
-	public String getTankUuid() {
-		return _tankUuid;
+	public Obstacle(final String pOwnerAddress, final int pWidth, final int pHeight, final float pCenterX, final float pCenterY, final float pRotation) {
+		this(pOwnerAddress, pWidth, pHeight, createState(pCenterX, pCenterY, pRotation));
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
-		final BulletSerialized serialized = new BulletSerialized();
+		final ObstacleSerialized serialized = new ObstacleSerialized();
 		fillSerialized(serialized);
-		serialized._tankUuid = _tankUuid;
 		return serialized;
 	}
 
