@@ -141,16 +141,13 @@ public class TanksLogic {
 		final TankState newTankState = pUpdateContext._newTankState;
 
 		if (newTankState._spawnAtMillis != null && newTankState._spawnAtMillis < pUpdateContext._timeMillis) {
-			pUpdateContext._tankDirty = true;
-			newTankState._damage = 0;
-			newTankState._spawnAtMillis = null;
-			while (true) {
-				newTankState._centerX = MathUtils.random() * _world.getWorld().getWorldW();
-				newTankState._centerY = MathUtils.random() * _world.getWorld().getWorldH();
-				newTankState._rotation = MathUtils.random() * 360.0f;
-				if (determineIntersections(pUpdateContext._tank, newTankState).isEmpty()) {
-					break;
-				}
+			newTankState._centerX = MathUtils.random() * _world.getWorld().getWorldW();
+			newTankState._centerY = MathUtils.random() * _world.getWorld().getWorldH();
+			newTankState._rotation = MathUtils.random() * 360.0f;
+			if (determineIntersections(pUpdateContext._tank, newTankState).isEmpty()) {
+				pUpdateContext._tankDirty = true;
+				newTankState._damage = 0;
+				newTankState._spawnAtMillis = null;
 			}
 		}
 	}
