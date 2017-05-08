@@ -172,7 +172,7 @@ public class TanksLogic {
 				removeBullet = true;
 			} else {
 				for (final Tank tank : getTanks()) {
-					if (tank.isMyBullet(bullet)) {
+					if (tank.isMyBullet(bullet) || tank.getState()._spawnAtMillis != null) {
 						continue;
 					}
 					if (tank.contains(newBulletState._centerX, newBulletState._centerY)) {
