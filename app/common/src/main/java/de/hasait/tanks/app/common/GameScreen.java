@@ -87,7 +87,7 @@ public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 		_shotSound = Gdx.audio.newSound(Gdx.files.internal("Shot.wav"));
 		addDisposable(_shotSound);
 
-		setBackgroundColor(new Color(0.4f, 0.4f, 0.1f, 1.0f));
+		setBackgroundColor(new Color(0.7f, 0.7f, 0.2f, 1.0f));
 		setBackgroundMusic("Music.mp3");
 		setTextMargin(10.0f);
 
