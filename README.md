@@ -19,5 +19,11 @@ A small but funny Java game.
 * Uses [libGDX](http://libgdx.badlogicgames.com/) for graphics
 * Uses [JGroups](http://www.jgroups.org/) for networking
 
+## Try it
+
+    mvn de.hasait.majala:majala-maven-plugin:majala \
+    -Dmajala.coords=de.hasait.tanks:tanks.app.pc:1.0.0.RELEASE \
+    -Dmajala.mainClass=de.hasait.tanks.app.pc.Main
+
 ## License
 Genesis is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
