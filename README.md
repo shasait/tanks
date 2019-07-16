@@ -34,4 +34,4 @@ A small but funny Java game.
 * Launch with: `java -jar tanks.app.pc-1.0.0.RELEASE-shaded.jar`
 
 ## License
-Genesis is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+tanks is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
