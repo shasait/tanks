@@ -53,6 +53,8 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 
 	private static final String PREFKEY__ROOM_NAME = "roomName";
 	private static final String PREFKEY__PLAYER_CONFIG = "playerConfig";
+	private static final String PREFKEY__NET_STACK = "netStack";
+	private static final String PREFKEY__NET_OPTIONS = "netOptions";
 
 	private final InputProcessor _inputProcessor = new InputAdapter() {
 
@@ -70,6 +72,8 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 	private final AtomicReference<ConfiguredActionFactory> _configuredActionFactory = new AtomicReference<>();
 
 	private final TextField _roomNameField;
+	private final TextField _netStackField;
+	private final TextField _netOptionsField;
 	private final List<TextField> _playerNameFields = new ArrayList<>();
 	private final TextButton _connectButton;
 	private boolean _connect;
@@ -94,6 +98,13 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		layout.add(createLabel("Room"));
 		_roomNameField = createTextField(preferences.getString(PREFKEY__ROOM_NAME, "Default"));
 		layout.add(_roomNameField);
+
+		layout.row();
+		layout.add(createLabel("Network"));
+		_netStackField = createTextField(preferences.getString(PREFKEY__NET_STACK, "udp"));
+		layout.add(_netStackField);
+		_netOptionsField = createTextField(preferences.getString(PREFKEY__NET_OPTIONS, "localhost[7800]"));
+		layout.add(_netOptionsField);
 
 		for (int i = 0; i < 2; i++) {
 			layout.row();
@@ -165,16 +176,31 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		if (_connect) {
 			_connect = false;
 
+			final GameConfig config = new GameConfig();
+
 			final String roomName = _roomNameField.getText();
 			if (Util.isBlank(roomName)) {
 				return;
 			}
 
+			config.setRoomName(roomName);
+
+			final String netStack = _netStackField.getText();
+			final String netOptions = _netOptionsField.getText();
+			if ("udp".equals(netStack)) {
+
+			} else if ("tcp".equals(netStack)) {
+				config.putNetworkSystemProperty("jgroups.tcpping.initial_hosts", netOptions);
+			} else {
+				return;
+			}
+
 			final Preferences preferences = obtainPreferences();
 			preferences.putString(PREFKEY__ROOM_NAME, roomName);
+			preferences.putString(PREFKEY__NET_STACK, netStack);
+			preferences.putString(PREFKEY__NET_OPTIONS, netOptions);
 
-			final GameConfig config = new GameConfig();
-			config.setRoomName(roomName);
+			config.setNetworkStack(netStack);
 			config.setWishPiecesX(40);
 			config.setWishPiecesY(24);
 
@@ -202,7 +228,8 @@ public class MainMenuScreen extends Abstract2DScreen<TanksScreenContext> {
 		}
 	}
 
-	private Label actionConfig(final String pTitle, final Supplier<ConfiguredAction> pActionSupplier, final Consumer<ConfiguredAction> pActionConsumer) {
+	private Label actionConfig(final String pTitle, final Supplier<ConfiguredAction> pActionSupplier,
+			final Consumer<ConfiguredAction> pActionConsumer) {
 		final Label label = createLabel(pTitle);
 		final Consumer<ConfiguredAction> actionConsumer = pAction -> {
 			label.setText(pTitle + ": " + pAction);

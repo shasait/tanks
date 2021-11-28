@@ -18,7 +18,9 @@ package de.hasait.tanks.app.common.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -30,6 +32,17 @@ public class GameConfig implements Serializable {
 	private String _roomName;
 
 	private int _wishPiecesX, _wishPiecesY;
+
+	private String _networkStack;
+	private Map<String, String> _networkSystemProperties = new HashMap<>();
+
+	public String getNetworkStack() {
+		return _networkStack;
+	}
+
+	public Map<String, String> getNetworkSystemProperties() {
+		return _networkSystemProperties;
+	}
 
 	public List<PlayerConfig> getPlayers() {
 		return _players;
@@ -45,6 +58,14 @@ public class GameConfig implements Serializable {
 
 	public int getWishPiecesY() {
 		return _wishPiecesY;
+	}
+
+	public void putNetworkSystemProperty(final String pKey, final String pValue) {
+		_networkSystemProperties.put(pKey, pValue);
+	}
+
+	public void setNetworkStack(final String pNetworkStack) {
+		_networkStack = pNetworkStack;
 	}
 
 	public void setRoomName(final String pRoomName) {

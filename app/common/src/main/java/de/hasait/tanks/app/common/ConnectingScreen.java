@@ -77,8 +77,10 @@ public class ConnectingScreen extends Abstract2DScreen<TanksScreenContext> {
 	@Override
 	protected void renderInternal(final float pDelta) {
 		if (_connect == null) {
-			_connect = Util.EXECUTOR_SERVICE
-					.submit(() -> _world.connect(_config.getRoomName(), _config.getWishPiecesX(), _config.getWishPiecesY()));
+			_connect = Util.EXECUTOR_SERVICE.submit(() -> _world
+					.connect(_config.getRoomName(), _config.getNetworkStack(), _config.getNetworkSystemProperties(), _config.getWishPiecesX(),
+							 _config.getWishPiecesY()
+					));
 		} else if (_connect.isDone() && _world.hasWorld()) {
 			for (final PlayerConfig playerConfig : _config.getPlayers()) {
 				for (int i = 0; i < 2; i++) {

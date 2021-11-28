@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -53,13 +54,15 @@ public class DistributedWorld implements Disposable {
 		super();
 	}
 
-	public void connect(final String pRoomName, final int pWishPiecesX, final int pWishPiecesY) {
+	public void connect(final String pRoomName, final String pNetworkStack, final Map<String, String> pNetSysProperties,
+			final int pWishPiecesX, final int pWishPiecesY) {
 		if (_channel.get() != null) {
 			throw new IllegalStateException("Already connected");
 		}
 		final JChannel channel;
 		try {
-			channel = new JChannel();
+			pNetSysProperties.forEach(System::setProperty);
+			channel = new JChannel(pNetworkStack + ".xml");
 		} catch (Exception pE) {
 			throw new RuntimeException("Could not create JChannel", pE);
 		}
