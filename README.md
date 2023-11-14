@@ -16,7 +16,7 @@ A small but funny Java game.
         * Numpad 5213: Move and rotate tank
         * Numpad 46: Rotate turret
         * Numpad 0: Fire
-* Uses [libGDX](http://libgdx.badlogicgames.com/) for graphics
+* Uses [libGDX](https://libgdx.com/) for graphics
 * Uses [JGroups](http://www.jgroups.org/) for networking
 
 ## Try it
