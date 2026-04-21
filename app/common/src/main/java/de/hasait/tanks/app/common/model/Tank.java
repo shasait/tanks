@@ -24,45 +24,45 @@ import java.util.UUID;
  */
 public class Tank extends AbstractMovableGameObject<TankState> {
 
-	private static TankState createState(final long pSpawnAtMillis) {
-		final TankState state = new TankState();
-		state._uuid = UUID.randomUUID().toString();
-		state._spawnAtMillis = pSpawnAtMillis;
-		return state;
-	}
+    private final String _name;
 
-	private final String _name;
+    public Tank(final String pOwnerAddress, final int pWidth, final int pHeight, final String pName, final TankState pState) {
+        super(pOwnerAddress, pWidth, pHeight);
+
+        _name = pName;
+
+        apply(pState);
+    }
 
 
-	public Tank(final String pOwnerAddress, final int pWidth, final int pHeight, final String pName, final TankState pState) {
-		super(pOwnerAddress, pWidth, pHeight);
+    public Tank(final String pOwnerAddress, final int pWidth, final int pHeight, final String pName, final long pSpawnAtMillis) {
+        this(pOwnerAddress, pWidth, pHeight, pName, createState(pSpawnAtMillis));
+    }
 
-		_name = pName;
+    private static TankState createState(final long pSpawnAtMillis) {
+        final TankState state = new TankState();
+        state._uuid = UUID.randomUUID().toString();
+        state._spawnAtMillis = pSpawnAtMillis;
+        return state;
+    }
 
-		apply(pState);
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public Tank(final String pOwnerAddress, final int pWidth, final int pHeight, final String pName, final long pSpawnAtMillis) {
-		this(pOwnerAddress, pWidth, pHeight, pName, createState(pSpawnAtMillis));
-	}
+    public boolean isMyBullet(final Bullet pBullet) {
+        return getUuid().equals(pBullet.getTankUuid());
+    }
 
-	public String getName() {
-		return _name;
-	}
+    public void setTurretRotation(final float pTurretRotation) {
+        transformState(pState -> pState._turretRotation != pTurretRotation, pState -> pState._turretRotation = pTurretRotation);
+    }
 
-	public boolean isMyBullet(final Bullet pBullet) {
-		return getUuid().equals(pBullet.getTankUuid());
-	}
-
-	public void setTurretRotation(final float pTurretRotation) {
-		transformState(pState -> pState._turretRotation != pTurretRotation, pState -> pState._turretRotation = pTurretRotation);
-	}
-
-	private Object writeReplace() throws ObjectStreamException {
-		final TankSerialized serialized = new TankSerialized();
-		fillSerialized(serialized);
-		serialized._name = _name;
-		return serialized;
-	}
+    private Object writeReplace() throws ObjectStreamException {
+        final TankSerialized serialized = new TankSerialized();
+        fillSerialized(serialized);
+        serialized._name = _name;
+        return serialized;
+    }
 
 }

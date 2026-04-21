@@ -24,8 +24,8 @@ import de.hasait.tanks.util.common.Game;
  */
 public class Tanks extends Game<TanksScreenContext> {
 
-	public Tanks() {
-		super(TanksScreenContext::new, MainMenuScreen::new);
-	}
+    public Tanks() {
+        super(TanksScreenContext::new, MainMenuScreen::new);
+    }
 
 }

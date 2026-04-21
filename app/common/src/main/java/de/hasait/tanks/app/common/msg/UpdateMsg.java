@@ -16,28 +16,28 @@
 
 package de.hasait.tanks.app.common.msg;
 
+import de.hasait.tanks.app.common.model.BulletState;
+import de.hasait.tanks.app.common.model.TankState;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.hasait.tanks.app.common.model.BulletState;
-import de.hasait.tanks.app.common.model.TankState;
-
 /**
  *
  */
 public class UpdateMsg implements Serializable {
 
-	public final Set<TankState> _tanks = new HashSet<>();
-	public final Set<BulletState> _bullets = new HashSet<>();
-	public final Set<String> _removedBullets = new HashSet<>();
-	public final Set<String> _removedTanks = new HashSet<>();
-	public final List<String> _incrementDamage = new ArrayList<>();
+    public final Set<TankState> _tanks = new HashSet<>();
+    public final Set<BulletState> _bullets = new HashSet<>();
+    public final Set<String> _removedBullets = new HashSet<>();
+    public final Set<String> _removedTanks = new HashSet<>();
+    public final List<String> _incrementDamage = new ArrayList<>();
 
-	public boolean isEmpty() {
-		return _tanks.isEmpty() && _bullets.isEmpty() && _removedBullets.isEmpty() && _removedTanks.isEmpty() && _incrementDamage.isEmpty();
-	}
+    public boolean isEmpty() {
+        return _tanks.isEmpty() && _bullets.isEmpty() && _removedBullets.isEmpty() && _removedTanks.isEmpty() && _incrementDamage.isEmpty();
+    }
 
 }

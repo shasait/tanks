@@ -16,31 +16,31 @@
 
 package de.hasait.tanks.util.common;
 
-import java.util.function.Function;
-
 import com.badlogic.gdx.Screen;
+
+import java.util.function.Function;
 
 /**
  *
  */
 public class Game<C extends AbstractScreenContext> extends com.badlogic.gdx.Game {
 
-	private final Function<Game<C>, C> _contextFactory;
-	private final Function<C, Screen> _initialScreenFactory;
+    private final Function<Game<C>, C> _contextFactory;
+    private final Function<C, Screen> _initialScreenFactory;
 
-	public Game(final Function<Game<C>, C> pContextFactory, final Function<C, Screen> pInitialScreenFactory) {
-		super();
+    public Game(final Function<Game<C>, C> pContextFactory, final Function<C, Screen> pInitialScreenFactory) {
+        super();
 
-		_contextFactory = pContextFactory;
-		_initialScreenFactory = pInitialScreenFactory;
-	}
+        _contextFactory = pContextFactory;
+        _initialScreenFactory = pInitialScreenFactory;
+    }
 
 
-	@Override
-	public final void create() {
-		final C context = _contextFactory.apply(this);
-		final Screen initialScreen = _initialScreenFactory.apply(context);
-		setScreen(initialScreen);
-	}
+    @Override
+    public final void create() {
+        final C context = _contextFactory.apply(this);
+        final Screen initialScreen = _initialScreenFactory.apply(context);
+        setScreen(initialScreen);
+    }
 
 }

@@ -24,29 +24,29 @@ import java.util.UUID;
  */
 public class Obstacle extends AbstractGameObject<ObstacleState> {
 
-	private static ObstacleState createState(final float pCenterX, final float pCenterY, final float pRotation) {
-		final ObstacleState state = new ObstacleState();
-		state._uuid = UUID.randomUUID().toString();
-		state._centerX = pCenterX;
-		state._centerY = pCenterY;
-		state._rotation = pRotation;
-		return state;
-	}
+    public Obstacle(final String pOwnerAddress, final int pWidth, final int pHeight, final ObstacleState pState) {
+        super(pOwnerAddress, pWidth, pHeight);
 
-	public Obstacle(final String pOwnerAddress, final int pWidth, final int pHeight, final ObstacleState pState) {
-		super(pOwnerAddress, pWidth, pHeight);
+        apply(pState);
+    }
 
-		apply(pState);
-	}
+    public Obstacle(final String pOwnerAddress, final int pWidth, final int pHeight, final float pCenterX, final float pCenterY, final float pRotation) {
+        this(pOwnerAddress, pWidth, pHeight, createState(pCenterX, pCenterY, pRotation));
+    }
 
-	public Obstacle(final String pOwnerAddress, final int pWidth, final int pHeight, final float pCenterX, final float pCenterY, final float pRotation) {
-		this(pOwnerAddress, pWidth, pHeight, createState(pCenterX, pCenterY, pRotation));
-	}
+    private static ObstacleState createState(final float pCenterX, final float pCenterY, final float pRotation) {
+        final ObstacleState state = new ObstacleState();
+        state._uuid = UUID.randomUUID().toString();
+        state._centerX = pCenterX;
+        state._centerY = pCenterY;
+        state._rotation = pRotation;
+        return state;
+    }
 
-	private Object writeReplace() throws ObjectStreamException {
-		final ObstacleSerialized serialized = new ObstacleSerialized();
-		fillSerialized(serialized);
-		return serialized;
-	}
+    private Object writeReplace() throws ObjectStreamException {
+        final ObstacleSerialized serialized = new ObstacleSerialized();
+        fillSerialized(serialized);
+        return serialized;
+    }
 
 }

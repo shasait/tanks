@@ -21,11 +21,11 @@ package de.hasait.tanks.app.common.model;
  */
 public class TankState extends AbstractState<TankState> {
 
-	public float _turretRotation;
+    public float _turretRotation;
 
-	public int _points;
-	public int _damage;
+    public int _points;
+    public int _damage;
 
-	public Long _spawnAtMillis;
+    public Long _spawnAtMillis;
 
 }

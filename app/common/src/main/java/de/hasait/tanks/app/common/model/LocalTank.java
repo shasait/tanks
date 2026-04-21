@@ -23,40 +23,40 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class LocalTank {
 
-	private final String _tankUuid;
-	private final PlayerConfig _playerConfig;
-	private final AtomicInteger _tankDamageIncrement = new AtomicInteger();
-	private long _lastShotTimeMillis;
+    private final String _tankUuid;
+    private final PlayerConfig _playerConfig;
+    private final AtomicInteger _tankDamageIncrement = new AtomicInteger();
+    private long _lastShotTimeMillis;
 
-	public LocalTank(final String pTankUuid, final PlayerConfig pPlayerConfig) {
-		super();
+    public LocalTank(final String pTankUuid, final PlayerConfig pPlayerConfig) {
+        super();
 
-		_tankUuid = pTankUuid;
-		_playerConfig = pPlayerConfig;
-	}
+        _tankUuid = pTankUuid;
+        _playerConfig = pPlayerConfig;
+    }
 
-	public int getAndResetDamageIncrement() {
-		return _tankDamageIncrement.getAndSet(0);
-	}
+    public int getAndResetDamageIncrement() {
+        return _tankDamageIncrement.getAndSet(0);
+    }
 
-	public long getLastShotTimeMillis() {
-		return _lastShotTimeMillis;
-	}
+    public long getLastShotTimeMillis() {
+        return _lastShotTimeMillis;
+    }
 
-	public PlayerConfig getPlayerConfig() {
-		return _playerConfig;
-	}
+    public void setLastShotTimeMillis(final long pLastShotTimeMillis) {
+        _lastShotTimeMillis = pLastShotTimeMillis;
+    }
 
-	public String getTankUuid() {
-		return _tankUuid;
-	}
+    public PlayerConfig getPlayerConfig() {
+        return _playerConfig;
+    }
 
-	public void incrementDamageIncrement() {
-		_tankDamageIncrement.incrementAndGet();
-	}
+    public String getTankUuid() {
+        return _tankUuid;
+    }
 
-	public void setLastShotTimeMillis(final long pLastShotTimeMillis) {
-		_lastShotTimeMillis = pLastShotTimeMillis;
-	}
+    public void incrementDamageIncrement() {
+        _tankDamageIncrement.incrementAndGet();
+    }
 
 }

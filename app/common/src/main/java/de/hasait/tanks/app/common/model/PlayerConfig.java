@@ -16,110 +16,110 @@
 
 package de.hasait.tanks.app.common.model;
 
-import java.io.Serializable;
-
 import de.hasait.tanks.app.common.TankActions;
 import de.hasait.tanks.util.common.Abstract2DScreen;
 import de.hasait.tanks.util.common.input.ConfiguredAction;
+
+import java.io.Serializable;
 
 /**
  *
  */
 public class PlayerConfig implements Serializable {
 
-	private String _name;
+    private String _name;
 
-	private ConfiguredAction _moveForward, _moveBackward;
-	private ConfiguredAction _rotateLeft, _rotateRight;
-	private ConfiguredAction _turrentRotateLeft, _turrentRotateRight;
-	private ConfiguredAction _fire;
+    private ConfiguredAction _moveForward, _moveBackward;
+    private ConfiguredAction _rotateLeft, _rotateRight;
+    private ConfiguredAction _turrentRotateLeft, _turrentRotateRight;
+    private ConfiguredAction _fire;
 
-	public void fillActions(final TankActions pTankActions) {
-		pTankActions._moveForward = getState(_moveForward);
-		pTankActions._moveBackward = getState(_moveBackward);
-		pTankActions._rotateLeft = getState(_rotateLeft);
-		pTankActions._rotateRight = getState(_rotateRight);
-		pTankActions._turrentRotateLeft = getState(_turrentRotateLeft);
-		pTankActions._turrentRotateRight = getState(_turrentRotateRight);
-		pTankActions._fire = getState(_fire);
-	}
+    public void fillActions(final TankActions pTankActions) {
+        pTankActions._moveForward = getState(_moveForward);
+        pTankActions._moveBackward = getState(_moveBackward);
+        pTankActions._rotateLeft = getState(_rotateLeft);
+        pTankActions._rotateRight = getState(_rotateRight);
+        pTankActions._turrentRotateLeft = getState(_turrentRotateLeft);
+        pTankActions._turrentRotateRight = getState(_turrentRotateRight);
+        pTankActions._fire = getState(_fire);
+    }
 
-	public ConfiguredAction getFire() {
-		return _fire;
-	}
+    public ConfiguredAction getFire() {
+        return _fire;
+    }
 
-	public ConfiguredAction getMoveBackward() {
-		return _moveBackward;
-	}
+    public void setFire(final ConfiguredAction pFire) {
+        _fire = pFire;
+    }
 
-	public ConfiguredAction getMoveForward() {
-		return _moveForward;
-	}
+    public ConfiguredAction getMoveBackward() {
+        return _moveBackward;
+    }
 
-	public String getName() {
-		return _name;
-	}
+    public void setMoveBackward(final ConfiguredAction pMoveBackward) {
+        _moveBackward = pMoveBackward;
+    }
 
-	public ConfiguredAction getRotateLeft() {
-		return _rotateLeft;
-	}
+    public ConfiguredAction getMoveForward() {
+        return _moveForward;
+    }
 
-	public ConfiguredAction getRotateRight() {
-		return _rotateRight;
-	}
+    public void setMoveForward(final ConfiguredAction pMoveForward) {
+        _moveForward = pMoveForward;
+    }
 
-	public ConfiguredAction getTurrentRotateLeft() {
-		return _turrentRotateLeft;
-	}
+    public String getName() {
+        return _name;
+    }
 
-	public ConfiguredAction getTurrentRotateRight() {
-		return _turrentRotateRight;
-	}
+    public void setName(final String pName) {
+        _name = pName;
+    }
 
-	public void initActions(final Abstract2DScreen<?> pScreen) {
-		_moveForward.init(pScreen);
-		_moveBackward.init(pScreen);
-		_rotateLeft.init(pScreen);
-		_rotateRight.init(pScreen);
-		_turrentRotateLeft.init(pScreen);
-		_turrentRotateRight.init(pScreen);
-		_fire.init(pScreen);
-	}
+    public ConfiguredAction getRotateLeft() {
+        return _rotateLeft;
+    }
 
-	public void setFire(final ConfiguredAction pFire) {
-		_fire = pFire;
-	}
+    public void setRotateLeft(final ConfiguredAction pRotateLeft) {
+        _rotateLeft = pRotateLeft;
+    }
 
-	public void setMoveBackward(final ConfiguredAction pMoveBackward) {
-		_moveBackward = pMoveBackward;
-	}
+    public ConfiguredAction getRotateRight() {
+        return _rotateRight;
+    }
 
-	public void setMoveForward(final ConfiguredAction pMoveForward) {
-		_moveForward = pMoveForward;
-	}
+    public void setRotateRight(final ConfiguredAction pRotateRight) {
+        _rotateRight = pRotateRight;
+    }
 
-	public void setName(final String pName) {
-		_name = pName;
-	}
+    public ConfiguredAction getTurrentRotateLeft() {
+        return _turrentRotateLeft;
+    }
 
-	public void setRotateLeft(final ConfiguredAction pRotateLeft) {
-		_rotateLeft = pRotateLeft;
-	}
+    public void setTurrentRotateLeft(final ConfiguredAction pTurrentRotateLeft) {
+        _turrentRotateLeft = pTurrentRotateLeft;
+    }
 
-	public void setRotateRight(final ConfiguredAction pRotateRight) {
-		_rotateRight = pRotateRight;
-	}
+    public ConfiguredAction getTurrentRotateRight() {
+        return _turrentRotateRight;
+    }
 
-	public void setTurrentRotateLeft(final ConfiguredAction pTurrentRotateLeft) {
-		_turrentRotateLeft = pTurrentRotateLeft;
-	}
+    public void setTurrentRotateRight(final ConfiguredAction pTurrentRotateRight) {
+        _turrentRotateRight = pTurrentRotateRight;
+    }
 
-	public void setTurrentRotateRight(final ConfiguredAction pTurrentRotateRight) {
-		_turrentRotateRight = pTurrentRotateRight;
-	}
+    public void initActions(final Abstract2DScreen<?> pScreen) {
+        _moveForward.init(pScreen);
+        _moveBackward.init(pScreen);
+        _rotateLeft.init(pScreen);
+        _rotateRight.init(pScreen);
+        _turrentRotateLeft.init(pScreen);
+        _turrentRotateRight.init(pScreen);
+        _fire.init(pScreen);
+    }
 
-	private float getState(final ConfiguredAction pAction) {
-		return pAction != null ? pAction.getState() : 0.0f;
-	}
+    private float getState(final ConfiguredAction pAction) {
+        return pAction != null ? pAction.getState() : 0.0f;
+    }
 
 }

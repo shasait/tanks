@@ -38,122 +38,119 @@ import de.hasait.tanks.util.common.Util;
  */
 public class GameScreen extends Abstract2DScreen<TanksScreenContext> {
 
-	private final InputProcessor _inputProcessor = new InputAdapter() {
+    private final InputProcessor _inputProcessor = new InputAdapter() {
 
-		@Override
-		public boolean keyUp(final int keycode) {
-			if (keycode == Keys.M) {
-				toggleBackgroundMusic();
-				return true;
-			}
-			if (keycode == Keys.ESCAPE) {
-				Gdx.app.exit();
-			}
-			return super.keyUp(keycode);
-		}
-
-
-	};
-
-	private final TanksLogic.Callback _callback = new TanksLogic.Callback() {
-		@Override
-		public void onSpawnBullet() {
-			_shotSound.play();
-		}
-	};
-
-	private final DistributedWorld _world;
-	private final TanksLogic _tanksLogic;
-
-	private Texture _tankTexture;
-	private Texture _turretTexture;
-	private Texture _bulletTexture;
-	private Texture _rockTexture;
-	private Sound _shotSound;
+        @Override
+        public boolean keyUp(final int keycode) {
+            if (keycode == Keys.M) {
+                toggleBackgroundMusic();
+                return true;
+            }
+            if (keycode == Keys.ESCAPE) {
+                Gdx.app.exit();
+            }
+            return super.keyUp(keycode);
+        }
 
 
-	public GameScreen(final TanksScreenContext pContext, final DistributedWorld pWorld) {
-		super(pContext, pWorld.getWorld().getWorldW(), pWorld.getWorld().getWorldH());
+    };
+    private final DistributedWorld _world;
+    private final TanksLogic _tanksLogic;
+    private final Texture _tankTexture;
+    private final Texture _turretTexture;
+    private final Texture _bulletTexture;
+    private final Texture _rockTexture;
+    private final Sound _shotSound;
+    private final TanksLogic.Callback _callback = new TanksLogic.Callback() {
+        @Override
+        public void onSpawnBullet() {
+            _shotSound.play();
+        }
+    };
 
-		_world = pWorld;
-		addDisposable(_world);
-		_tanksLogic = new TanksLogic(_world, _callback);
 
-		_tankTexture = loadTexture("Tank.png");
-		_turretTexture = loadTexture("Turret.png");
-		_bulletTexture = loadTexture("Bullet.png");
-		_rockTexture = loadTexture("Rock.png");
+    public GameScreen(final TanksScreenContext pContext, final DistributedWorld pWorld) {
+        super(pContext, pWorld.getWorld().getWorldW(), pWorld.getWorld().getWorldH());
 
-		_shotSound = Gdx.audio.newSound(Gdx.files.internal("Shot.wav"));
-		addDisposable(_shotSound);
+        _world = pWorld;
+        addDisposable(_world);
+        _tanksLogic = new TanksLogic(_world, _callback);
 
-		setBackgroundColor(new Color(0.7f, 0.7f, 0.2f, 1.0f));
-		setBackgroundMusic("Music.mp3");
-		setTextMargin(10.0f);
+        _tankTexture = loadTexture("Tank.png");
+        _turretTexture = loadTexture("Turret.png");
+        _bulletTexture = loadTexture("Bullet.png");
+        _rockTexture = loadTexture("Rock.png");
 
-		addInputProcessor(_inputProcessor);
+        _shotSound = Gdx.audio.newSound(Gdx.files.internal("Shot.wav"));
+        addDisposable(_shotSound);
 
-		for (final LocalTank tank : _world.getWorld().getLocalLocalTanks()) {
-			tank.getPlayerConfig().initActions(this);
-		}
-	}
+        setBackgroundColor(new Color(0.7f, 0.7f, 0.2f, 1.0f));
+        setBackgroundMusic("Music.mp3");
+        setTextMargin(10.0f);
 
-	@Override
-	protected void renderInternal(final float pDeltaTimeSeconds) {
-		paintFrame();
+        addInputProcessor(_inputProcessor);
 
-		_tanksLogic.update(getTimeMillis(), pDeltaTimeSeconds);
-	}
+        for (final LocalTank tank : _world.getWorld().getLocalLocalTanks()) {
+            tank.getPlayerConfig().initActions(this);
+        }
+    }
 
-	private TankState drawTankStatusText(final Tank pTank, final boolean pDamageInsteadOfPointsVisible, final boolean pSpawnVisible) {
-		final TankState state = pTank.getState();
-		final StringBuilder sb = new StringBuilder();
-		sb.append(pTank.getName());
-		sb.append(": ");
-		if (pDamageInsteadOfPointsVisible) {
-			final int maxDamage = _tanksLogic.getRules()._maxDamage;
-			final int health = Math.max(0, maxDamage - state._damage);
-			final int damage = maxDamage - health;
-			sb.append(Util.repeat("X", damage));
-			sb.append(Util.repeat("O", health));
-		} else {
-			sb.append(state._points);
-		}
-		if (pSpawnVisible) {
-			if (state._spawnAtMillis != null) {
-				sb.append(" (spawn in ");
-				sb.append((Math.max(0, state._spawnAtMillis - getTimeMillis())) / 1000);
-				sb.append("s)");
-			}
-		}
-		drawText(sb.toString());
-		drawText("");
-		return state;
-	}
+    @Override
+    protected void renderInternal(final float pDeltaTimeSeconds) {
+        paintFrame();
 
-	private void paintFrame() {
-		_tanksLogic.getLocalTanks().forEach(pTank -> drawTankStatusText(pTank, true, false));
+        _tanksLogic.update(getTimeMillis(), pDeltaTimeSeconds);
+    }
 
-		_tanksLogic.getObstacles().forEach(pObstacle -> paintGameObject(pObstacle, _rockTexture));
-		_tanksLogic.getBullets().forEach(pBullet -> paintGameObject(pBullet, _bulletTexture));
+    private TankState drawTankStatusText(final Tank pTank, final boolean pDamageInsteadOfPointsVisible, final boolean pSpawnVisible) {
+        final TankState state = pTank.getState();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(pTank.getName());
+        sb.append(": ");
+        if (pDamageInsteadOfPointsVisible) {
+            final int maxDamage = _tanksLogic.getRules()._maxDamage;
+            final int health = Math.max(0, maxDamage - state._damage);
+            final int damage = maxDamage - health;
+            sb.append(Util.repeat("X", damage));
+            sb.append(Util.repeat("O", health));
+        } else {
+            sb.append(state._points);
+        }
+        if (pSpawnVisible) {
+            if (state._spawnAtMillis != null) {
+                sb.append(" (spawn in ");
+                sb.append((Math.max(0, state._spawnAtMillis - getTimeMillis())) / 1000);
+                sb.append("s)");
+            }
+        }
+        drawText(sb.toString());
+        drawText("");
+        return state;
+    }
 
-		for (final Tank tank : _tanksLogic.getTanks()) {
-			final TankState state = drawTankStatusText(tank, false, true);
-			if (state._spawnAtMillis == null) {
-				paintGameObject(tank, state, _tankTexture);
-				drawTexture(_turretTexture, state._centerX, state._centerY, _world.getWorld().getTurretW(), _world.getWorld().getTurretH(),
-							state._rotation + state._turretRotation
-				);
-			}
-		}
-	}
+    private void paintFrame() {
+        _tanksLogic.getLocalTanks().forEach(pTank -> drawTankStatusText(pTank, true, false));
 
-	private <S extends AbstractState<S>> void paintGameObject(final AbstractGameObject<S> pGameObject, final Texture pTexture) {
-		paintGameObject(pGameObject, pGameObject.getState(), pTexture);
-	}
+        _tanksLogic.getObstacles().forEach(pObstacle -> paintGameObject(pObstacle, _rockTexture));
+        _tanksLogic.getBullets().forEach(pBullet -> paintGameObject(pBullet, _bulletTexture));
 
-	private <S extends AbstractState<S>> void paintGameObject(final AbstractGameObject<S> pGameObject, final S pState, final Texture pTexture) {
-		drawTexture(pTexture, pState._centerX, pState._centerY, pGameObject.getWidth(), pGameObject.getHeight(), pState._rotation);
-	}
+        for (final Tank tank : _tanksLogic.getTanks()) {
+            final TankState state = drawTankStatusText(tank, false, true);
+            if (state._spawnAtMillis == null) {
+                paintGameObject(tank, state, _tankTexture);
+                drawTexture(_turretTexture, state._centerX, state._centerY, _world.getWorld().getTurretW(), _world.getWorld().getTurretH(),
+                        state._rotation + state._turretRotation
+                );
+            }
+        }
+    }
+
+    private <S extends AbstractState<S>> void paintGameObject(final AbstractGameObject<S> pGameObject, final Texture pTexture) {
+        paintGameObject(pGameObject, pGameObject.getState(), pTexture);
+    }
+
+    private <S extends AbstractState<S>> void paintGameObject(final AbstractGameObject<S> pGameObject, final S pState, final Texture pTexture) {
+        drawTexture(pTexture, pState._centerX, pState._centerY, pGameObject.getWidth(), pGameObject.getHeight(), pState._rotation);
+    }
 
 }

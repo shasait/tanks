@@ -16,70 +16,69 @@
 
 package de.hasait.tanks.util.common;
 
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
+import de.hasait.tanks.util.common.input.ConfiguredAction;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
-
-import de.hasait.tanks.util.common.input.ConfiguredAction;
 
 /**
  *
  */
 public abstract class AbstractConfiguredAction implements ConfiguredAction {
 
-	private final AtomicBoolean _initialized = new AtomicBoolean();
+    private final AtomicBoolean _initialized = new AtomicBoolean();
 
-	private final AtomicReference<Float> _state = new AtomicReference<>(0.0f);
+    private final AtomicReference<Float> _state = new AtomicReference<>(0.0f);
 
-	private final List<InputProcessor> _inputProcessors = new CopyOnWriteArrayList<>();
+    private final List<InputProcessor> _inputProcessors = new CopyOnWriteArrayList<>();
 
-	private InputMultiplexer _inputMultiplexer;
+    private InputMultiplexer _inputMultiplexer;
 
 
-	@Override
-	public final void dispose() {
-		if (!_initialized.compareAndSet(true, false)) {
-			throw new IllegalStateException("Not initialized");
-		}
+    @Override
+    public final void dispose() {
+        if (!_initialized.compareAndSet(true, false)) {
+            throw new IllegalStateException("Not initialized");
+        }
 
-		_inputProcessors.forEach(_inputMultiplexer::removeProcessor);
+        _inputProcessors.forEach(_inputMultiplexer::removeProcessor);
 
-		disposeInternal();
-		_inputMultiplexer = null;
-	}
+        disposeInternal();
+        _inputMultiplexer = null;
+    }
 
-	@Override
-	public final float getState() {
-		return _state.get();
-	}
+    @Override
+    public final float getState() {
+        return _state.get();
+    }
 
-	@Override
-	public final void init(final Abstract2DScreen<?> pScreen) {
-		if (!_initialized.compareAndSet(false, true)) {
-			throw new IllegalStateException("Already initialized");
-		}
+    @Override
+    public final void init(final Abstract2DScreen<?> pScreen) {
+        if (!_initialized.compareAndSet(false, true)) {
+            throw new IllegalStateException("Already initialized");
+        }
 
-		_inputMultiplexer = pScreen.getInputMultiplexer();
-		pScreen.addDisposable(this);
+        _inputMultiplexer = pScreen.getInputMultiplexer();
+        pScreen.addDisposable(this);
 
-		initInternal();
-	}
+        initInternal();
+    }
 
-	protected final void addInputProcessor(final InputProcessor pInputProcessor) {
-		_inputProcessors.add(pInputProcessor);
-		_inputMultiplexer.addProcessor(pInputProcessor);
-	}
+    protected final void addInputProcessor(final InputProcessor pInputProcessor) {
+        _inputProcessors.add(pInputProcessor);
+        _inputMultiplexer.addProcessor(pInputProcessor);
+    }
 
-	protected abstract void disposeInternal();
+    protected abstract void disposeInternal();
 
-	protected abstract void initInternal();
+    protected abstract void initInternal();
 
-	protected final void updateState(final float pState) {
-		_state.set(pState);
-	}
+    protected final void updateState(final float pState) {
+        _state.set(pState);
+    }
 
 }

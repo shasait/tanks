@@ -24,12 +24,12 @@ import java.io.Serializable;
  */
 public class ControllerAxisMoveActionSerialized implements Serializable {
 
-	public String _controllerName;
-	public int _axisIndex;
-	public boolean _positive;
+    public String _controllerName;
+    public int _axisIndex;
+    public boolean _positive;
 
-	private Object readResolve() throws ObjectStreamException {
-		return new ControllerAxisMoveAction(_controllerName, _axisIndex, _positive);
-	}
+    private Object readResolve() throws ObjectStreamException {
+        return new ControllerAxisMoveAction(_controllerName, _axisIndex, _positive);
+    }
 
 }

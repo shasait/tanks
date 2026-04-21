@@ -23,9 +23,9 @@ import java.io.Serializable;
  */
 public abstract class AbstractGameObjectSerialized<S extends AbstractState<S>> implements Serializable {
 
-	public String _ownerAddress;
-	public S _state;
-	public int _width;
-	public int _height;
+    public String _ownerAddress;
+    public S _state;
+    public int _width;
+    public int _height;
 
 }

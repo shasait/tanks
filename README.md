@@ -30,8 +30,9 @@ A small but funny Java game.
 ### Download and launch
 
 * Download [tanks.app.pc-1.0.0.RELEASE-shaded.jar](https://repo1.maven.org/maven2/de/hasait/tanks/tanks.app.pc/1.0.0.RELEASE/tanks.app.pc-1.0.0.RELEASE-shaded.jar
-)
+  )
 * Launch with: `java -jar tanks.app.pc-1.0.0.RELEASE-shaded.jar`
 
 ## License
+
 tanks is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).

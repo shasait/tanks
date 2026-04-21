@@ -18,103 +18,99 @@
 
 <configuration>
 
-	<!-- 
-	#########################################################################################
-	# file appender
-	#########################################################################################
-	-->
+    <!--
+    #########################################################################################
+    # file appender
+    #########################################################################################
+    -->
 
-	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>log.txt</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>log-%i.txt</fileNamePattern>
-			<minIndex>1</minIndex>
-			<maxIndex>3</maxIndex>
-		</rollingPolicy>
-		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<maxFileSize>100MB</maxFileSize>
-		</triggeringPolicy>
-		<encoder>
-			<pattern>%d{ISO8601} %d{z} | %15.15t | %5p | %45.45c - %m%n</pattern>
-		</encoder>
-	</appender>
-
-
-
-	<!-- 
-	#########################################################################################
-	# console appender
-	#########################################################################################
-	-->
-
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<target>System.out</target>
-		<encoder>
-			<pattern>%d{ISO8601} %d{z} | %15.15t | %5p | %45.45c - %m%n</pattern>
-		</encoder>
-	</appender>
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>log-%i.txt</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>100MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%d{ISO8601} %d{z} | %15.15t | %5p | %45.45c - %m%n</pattern>
+        </encoder>
+    </appender>
 
 
+    <!--
+    #########################################################################################
+    # console appender
+    #########################################################################################
+    -->
 
-	<!-- 
-	#########################################################################################
-	# console appender with additional debug info
-	#########################################################################################
-	-->
-
-	<appender name="dconsole" class="ch.qos.logback.core.ConsoleAppender">
-		<target>System.out</target>
-		<encoder>
-			<pattern>%d{ISO8601} %d{z} | %15.15t | %5p | %45.45c - %m \(%F:%L\)%n</pattern>
-		</encoder>
-	</appender>
-
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%d{ISO8601} %d{z} | %15.15t | %5p | %45.45c - %m%n</pattern>
+        </encoder>
+    </appender>
 
 
-	<!-- 
-	#########################################################################################
-	# root configuration
-	#########################################################################################
-	-->
+    <!--
+    #########################################################################################
+    # console appender with additional debug info
+    #########################################################################################
+    -->
 
-	<!-- 1. standard (enable WARN,ERROR,FATAL) - ->
-	<root>
-		<level value="WARN" />
-		<appender-ref ref="file" />
-	</root>
-	<!- - -->
-
-	<!-- 2. for DEBUG  - DO NOT USE in production - ->
-	<root>
-		<level value="INFO" />
-		<appender-ref ref="console" />
-	</root>
-	<!- - -->
-
-	<!-- 3. for extreme DEBUG with time-consuming %F:%L - DO NOT USE in production - ->
-	<root>
-		<level value="DEBUG" />
-		<appender-ref ref="dconsole" />
-	</root>
-	<!- - -->
-
-	<!-- 4. custom - DO NOT USE in production -->
-	<root>
-		<level value="INFO" />
-		<appender-ref ref="console" />
-	</root>
-	<!-- -->
+    <appender name="dconsole" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%d{ISO8601} %d{z} | %15.15t | %5p | %45.45c - %m \(%F:%L\)%n</pattern>
+        </encoder>
+    </appender>
 
 
+    <!--
+    #########################################################################################
+    # root configuration
+    #########################################################################################
+    -->
 
-	<!-- 
-	#########################################################################################
-	# additional loggers
-	#########################################################################################
-	-->
+    <!-- 1. standard (enable WARN,ERROR,FATAL) - ->
+    <root>
+        <level value="WARN" />
+        <appender-ref ref="file" />
+    </root>
+    <!- - -->
 
-	<logger name="de.hasait">
-		<level value="INFO" />
-	</logger>
+    <!-- 2. for DEBUG  - DO NOT USE in production - ->
+    <root>
+        <level value="INFO" />
+        <appender-ref ref="console" />
+    </root>
+    <!- - -->
+
+    <!-- 3. for extreme DEBUG with time-consuming %F:%L - DO NOT USE in production - ->
+    <root>
+        <level value="DEBUG" />
+        <appender-ref ref="dconsole" />
+    </root>
+    <!- - -->
+
+    <!-- 4. custom - DO NOT USE in production -->
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="console"/>
+    </root>
+    <!-- -->
+
+
+    <!--
+    #########################################################################################
+    # additional loggers
+    #########################################################################################
+    -->
+
+    <logger name="de.hasait">
+        <level value="INFO"/>
+    </logger>
 
 </configuration>

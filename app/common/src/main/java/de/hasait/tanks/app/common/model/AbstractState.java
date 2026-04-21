@@ -23,19 +23,19 @@ import java.io.Serializable;
  */
 public abstract class AbstractState<S extends AbstractState<S>> implements Serializable, Cloneable {
 
-	public String _uuid;
+    public String _uuid;
 
-	public float _centerX;
-	public float _centerY;
-	public float _rotation;
+    public float _centerX;
+    public float _centerY;
+    public float _rotation;
 
-	public final S clone() {
-		try {
-			//noinspection unchecked
-			return (S) super.clone();
-		} catch (CloneNotSupportedException pE) {
-			throw new RuntimeException(pE);
-		}
-	}
+    public final S clone() {
+        try {
+            //noinspection unchecked
+            return (S) super.clone();
+        } catch (CloneNotSupportedException pE) {
+            throw new RuntimeException(pE);
+        }
+    }
 
 }

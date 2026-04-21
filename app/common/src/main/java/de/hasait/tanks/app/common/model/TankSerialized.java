@@ -23,10 +23,10 @@ import java.io.ObjectStreamException;
  */
 public class TankSerialized extends AbstractMovableGameObjectSerialized<TankState> {
 
-	public String _name;
+    public String _name;
 
-	private Object readResolve() throws ObjectStreamException {
-		return new Tank(_ownerAddress, _width, _height, _name, _state);
-	}
+    private Object readResolve() throws ObjectStreamException {
+        return new Tank(_ownerAddress, _width, _height, _name, _state);
+    }
 
 }

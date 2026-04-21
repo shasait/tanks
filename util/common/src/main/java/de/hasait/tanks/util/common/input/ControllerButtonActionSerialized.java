@@ -24,11 +24,11 @@ import java.io.Serializable;
  */
 public class ControllerButtonActionSerialized implements Serializable {
 
-	public String _controllerName;
-	public int _buttonIndex;
+    public String _controllerName;
+    public int _buttonIndex;
 
-	private Object readResolve() throws ObjectStreamException {
-		return new ControllerButtonAction(_controllerName, _buttonIndex);
-	}
+    private Object readResolve() throws ObjectStreamException {
+        return new ControllerButtonAction(_controllerName, _buttonIndex);
+    }
 
 }

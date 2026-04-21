@@ -25,36 +25,36 @@ import com.badlogic.gdx.utils.Disposable;
  */
 public abstract class AbstractScreenContext implements Disposable {
 
-	private final Game<?> _game;
+    private final Game<?> _game;
 
-	private final SpriteBatch _batch;
-	private final BitmapFont _font;
+    private final SpriteBatch _batch;
+    private final BitmapFont _font;
 
-	protected AbstractScreenContext(final Game<?> pGame) {
-		super();
+    protected AbstractScreenContext(final Game<?> pGame) {
+        super();
 
-		_game = pGame;
+        _game = pGame;
 
-		_batch = new SpriteBatch();
-		_font = new BitmapFont();
-	}
+        _batch = new SpriteBatch();
+        _font = new BitmapFont();
+    }
 
-	@Override
-	public void dispose() {
-		_font.dispose();
-		_batch.dispose();
-	}
+    @Override
+    public void dispose() {
+        _font.dispose();
+        _batch.dispose();
+    }
 
-	SpriteBatch getBatch() {
-		return _batch;
-	}
+    SpriteBatch getBatch() {
+        return _batch;
+    }
 
-	BitmapFont getFont() {
-		return _font;
-	}
+    BitmapFont getFont() {
+        return _font;
+    }
 
-	Game<?> getGame() {
-		return _game;
-	}
+    Game<?> getGame() {
+        return _game;
+    }
 
 }

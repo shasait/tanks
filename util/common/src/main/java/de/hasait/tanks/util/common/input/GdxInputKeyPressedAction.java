@@ -16,66 +16,65 @@
 
 package de.hasait.tanks.util.common.input;
 
-import java.io.ObjectStreamException;
-
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-
 import de.hasait.tanks.util.common.AbstractConfiguredAction;
+
+import java.io.ObjectStreamException;
 
 /**
  *
  */
 public class GdxInputKeyPressedAction extends AbstractConfiguredAction {
 
-	private final int _keycode;
+    private final int _keycode;
 
-	private final InputProcessor _inputProcessor = new InputAdapter() {
+    private final InputProcessor _inputProcessor = new InputAdapter() {
 
-		@Override
-		public boolean keyDown(final int pKeycode) {
-			if (_keycode == pKeycode) {
-				updateState(1.0f);
-				return true;
-			}
-			return super.keyDown(pKeycode);
-		}
+        @Override
+        public boolean keyDown(final int pKeycode) {
+            if (_keycode == pKeycode) {
+                updateState(1.0f);
+                return true;
+            }
+            return super.keyDown(pKeycode);
+        }
 
-		@Override
-		public boolean keyUp(final int pKeycode) {
-			if (_keycode == pKeycode) {
-				updateState(0.0f);
-				return true;
-			}
-			return super.keyUp(pKeycode);
-		}
+        @Override
+        public boolean keyUp(final int pKeycode) {
+            if (_keycode == pKeycode) {
+                updateState(0.0f);
+                return true;
+            }
+            return super.keyUp(pKeycode);
+        }
 
-	};
+    };
 
-	public GdxInputKeyPressedAction(final int pKeycode) {
-		_keycode = pKeycode;
-	}
+    public GdxInputKeyPressedAction(final int pKeycode) {
+        _keycode = pKeycode;
+    }
 
-	@Override
-	public String toString() {
-		return Input.Keys.toString(_keycode);
-	}
+    @Override
+    public String toString() {
+        return Input.Keys.toString(_keycode);
+    }
 
-	@Override
-	protected void disposeInternal() {
-		// nop
-	}
+    @Override
+    protected void disposeInternal() {
+        // nop
+    }
 
-	@Override
-	protected void initInternal() {
-		addInputProcessor(_inputProcessor);
-	}
+    @Override
+    protected void initInternal() {
+        addInputProcessor(_inputProcessor);
+    }
 
-	private Object writeReplace() throws ObjectStreamException {
-		final GdxInputKeyPressedActionSerialized serialized = new GdxInputKeyPressedActionSerialized();
-		serialized._keycode = _keycode;
-		return serialized;
-	}
+    private Object writeReplace() throws ObjectStreamException {
+        final GdxInputKeyPressedActionSerialized serialized = new GdxInputKeyPressedActionSerialized();
+        serialized._keycode = _keycode;
+        return serialized;
+    }
 
 }

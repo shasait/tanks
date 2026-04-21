@@ -23,8 +23,8 @@ import java.io.ObjectStreamException;
  */
 public class ObstacleSerialized extends AbstractGameObjectSerialized<ObstacleState> {
 
-	private Object readResolve() throws ObjectStreamException {
-		return new Obstacle(_ownerAddress, _width, _height, _state);
-	}
+    private Object readResolve() throws ObjectStreamException {
+        return new Obstacle(_ownerAddress, _width, _height, _state);
+    }
 
 }

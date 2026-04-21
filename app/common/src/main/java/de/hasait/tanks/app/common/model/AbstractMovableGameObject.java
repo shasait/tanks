@@ -16,52 +16,52 @@
 
 package de.hasait.tanks.app.common.model;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  *
  */
 public abstract class AbstractMovableGameObject<S extends AbstractState<S>> extends AbstractGameObject<S> {
 
-	private final AtomicReference<Vector2> _moveVectorHolder = new AtomicReference<>();
+    private final AtomicReference<Vector2> _moveVectorHolder = new AtomicReference<>();
 
-	protected AbstractMovableGameObject(final String pOwnerAddress, final int pWidth, final int pHeight) {
-		super(pOwnerAddress, pWidth, pHeight);
-	}
+    protected AbstractMovableGameObject(final String pOwnerAddress, final int pWidth, final int pHeight) {
+        super(pOwnerAddress, pWidth, pHeight);
+    }
 
-	public final Vector2 getMoveVector() {
-		return _moveVectorHolder.get();
-	}
+    public final Vector2 getMoveVector() {
+        return _moveVectorHolder.get();
+    }
 
-	public final void move(final float pDistance) {
-		transformState(pState -> true, pState -> move(pDistance, pState));
-	}
+    public final void move(final float pDistance) {
+        transformState(pState -> true, pState -> move(pDistance, pState));
+    }
 
-	public final void move(final float pDistance, final S pState) {
-		final Vector2 moveVector = getMoveVector();
-		pState._centerX += moveVector.x * pDistance;
-		pState._centerY += moveVector.y * pDistance;
-	}
+    public final void move(final float pDistance, final S pState) {
+        final Vector2 moveVector = getMoveVector();
+        pState._centerX += moveVector.x * pDistance;
+        pState._centerY += moveVector.y * pDistance;
+    }
 
-	protected void afterStateChange(final S pOldState, final S pNewState) {
-		if (pOldState == null || pOldState._rotation != pNewState._rotation) {
-			updateMoveVector(pNewState);
-		}
-		super.afterStateChange(pOldState, pNewState);
-	}
+    protected void afterStateChange(final S pOldState, final S pNewState) {
+        if (pOldState == null || pOldState._rotation != pNewState._rotation) {
+            updateMoveVector(pNewState);
+        }
+        super.afterStateChange(pOldState, pNewState);
+    }
 
-	protected void fillSerialized(final AbstractMovableGameObjectSerialized<S> pSerialized) {
-		super.fillSerialized(pSerialized);
-	}
+    protected void fillSerialized(final AbstractMovableGameObjectSerialized<S> pSerialized) {
+        super.fillSerialized(pSerialized);
+    }
 
-	private void updateMoveVector(final S pState) {
-		final Vector2 newMoveVector = new Vector2();
-		newMoveVector.x = 0;
-		newMoveVector.y = 1;
-		newMoveVector.rotate(pState._rotation);
-		_moveVectorHolder.set(newMoveVector);
-	}
+    private void updateMoveVector(final S pState) {
+        final Vector2 newMoveVector = new Vector2();
+        newMoveVector.x = 0;
+        newMoveVector.y = 1;
+        newMoveVector.rotate(pState._rotation);
+        _moveVectorHolder.set(newMoveVector);
+    }
 
 }

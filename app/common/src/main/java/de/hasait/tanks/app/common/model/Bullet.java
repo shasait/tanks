@@ -24,38 +24,38 @@ import java.util.UUID;
  */
 public class Bullet extends AbstractMovableGameObject<BulletState> {
 
-	private static BulletState createState(final float pCenterX, final float pCenterY, final float pRotation) {
-		final BulletState state = new BulletState();
-		state._uuid = UUID.randomUUID().toString();
-		state._centerX = pCenterX;
-		state._centerY = pCenterY;
-		state._rotation = pRotation;
-		return state;
-	}
+    private final String _tankUuid;
 
-	private final String _tankUuid;
+    public Bullet(final String pOwnerAddress, final int pWidth, final int pHeight, final String pTankUuid, final BulletState pState) {
+        super(pOwnerAddress, pWidth, pHeight);
 
-	public Bullet(final String pOwnerAddress, final int pWidth, final int pHeight, final String pTankUuid, final BulletState pState) {
-		super(pOwnerAddress, pWidth, pHeight);
+        _tankUuid = pTankUuid;
 
-		_tankUuid = pTankUuid;
+        apply(pState);
+    }
 
-		apply(pState);
-	}
+    public Bullet(final String pOwnerAddress, final int pWidth, final int pHeight, final String pTankUuid, final float pCenterX, final float pCenterY, final float pRotation) {
+        this(pOwnerAddress, pWidth, pHeight, pTankUuid, createState(pCenterX, pCenterY, pRotation));
+    }
 
-	public Bullet(final String pOwnerAddress, final int pWidth, final int pHeight, final String pTankUuid, final float pCenterX, final float pCenterY, final float pRotation) {
-		this(pOwnerAddress, pWidth, pHeight, pTankUuid, createState(pCenterX, pCenterY, pRotation));
-	}
+    private static BulletState createState(final float pCenterX, final float pCenterY, final float pRotation) {
+        final BulletState state = new BulletState();
+        state._uuid = UUID.randomUUID().toString();
+        state._centerX = pCenterX;
+        state._centerY = pCenterY;
+        state._rotation = pRotation;
+        return state;
+    }
 
-	public String getTankUuid() {
-		return _tankUuid;
-	}
+    public String getTankUuid() {
+        return _tankUuid;
+    }
 
-	private Object writeReplace() throws ObjectStreamException {
-		final BulletSerialized serialized = new BulletSerialized();
-		fillSerialized(serialized);
-		serialized._tankUuid = _tankUuid;
-		return serialized;
-	}
+    private Object writeReplace() throws ObjectStreamException {
+        final BulletSerialized serialized = new BulletSerialized();
+        fillSerialized(serialized);
+        serialized._tankUuid = _tankUuid;
+        return serialized;
+    }
 
 }

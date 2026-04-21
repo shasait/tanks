@@ -26,13 +26,13 @@ import de.hasait.tanks.app.common.Tanks;
  */
 public class Main {
 
-	public static void main(final String[] pArgs) {
-		final LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 1280;
-		config.height = 768;
-		config.resizable = true;
+    public static void main(final String[] pArgs) {
+        final LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        config.width = 1280;
+        config.height = 768;
+        config.resizable = true;
 
-		new LwjglApplication(new Tanks(), config);
-	}
+        new LwjglApplication(new Tanks(), config);
+    }
 
 }

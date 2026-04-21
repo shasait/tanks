@@ -24,10 +24,10 @@ import java.io.Serializable;
  */
 public class GdxInputKeyPressedActionSerialized implements Serializable {
 
-	public int _keycode;
+    public int _keycode;
 
-	private Object readResolve() throws ObjectStreamException {
-		return new GdxInputKeyPressedAction(_keycode);
-	}
+    private Object readResolve() throws ObjectStreamException {
+        return new GdxInputKeyPressedAction(_keycode);
+    }
 
 }

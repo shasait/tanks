@@ -21,9 +21,9 @@ package de.hasait.tanks.app.common;
  */
 public class TankActions {
 
-	public float _moveForward, _moveBackward;
-	public float _rotateLeft, _rotateRight;
-	public float _turrentRotateLeft, _turrentRotateRight;
-	public float _fire;
+    public float _moveForward, _moveBackward;
+    public float _rotateLeft, _rotateRight;
+    public float _turrentRotateLeft, _turrentRotateRight;
+    public float _fire;
 
 }

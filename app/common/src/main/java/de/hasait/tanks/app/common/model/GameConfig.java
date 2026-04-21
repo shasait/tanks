@@ -27,57 +27,54 @@ import java.util.Map;
  */
 public class GameConfig implements Serializable {
 
-	private final List<PlayerConfig> _players = new ArrayList<>();
+    private final List<PlayerConfig> _players = new ArrayList<>();
+    private final Map<String, String> _networkSystemProperties = new HashMap<>();
+    private String _roomName;
+    private int _wishPiecesX, _wishPiecesY;
+    private String _networkStack;
 
-	private String _roomName;
+    public String getNetworkStack() {
+        return _networkStack;
+    }
 
-	private int _wishPiecesX, _wishPiecesY;
+    public void setNetworkStack(final String pNetworkStack) {
+        _networkStack = pNetworkStack;
+    }
 
-	private String _networkStack;
-	private Map<String, String> _networkSystemProperties = new HashMap<>();
+    public Map<String, String> getNetworkSystemProperties() {
+        return _networkSystemProperties;
+    }
 
-	public String getNetworkStack() {
-		return _networkStack;
-	}
+    public List<PlayerConfig> getPlayers() {
+        return _players;
+    }
 
-	public Map<String, String> getNetworkSystemProperties() {
-		return _networkSystemProperties;
-	}
+    public String getRoomName() {
+        return _roomName;
+    }
 
-	public List<PlayerConfig> getPlayers() {
-		return _players;
-	}
+    public void setRoomName(final String pRoomName) {
+        _roomName = pRoomName;
+    }
 
-	public String getRoomName() {
-		return _roomName;
-	}
+    public int getWishPiecesX() {
+        return _wishPiecesX;
+    }
 
-	public int getWishPiecesX() {
-		return _wishPiecesX;
-	}
+    public void setWishPiecesX(final int pWishPiecesX) {
+        _wishPiecesX = pWishPiecesX;
+    }
 
-	public int getWishPiecesY() {
-		return _wishPiecesY;
-	}
+    public int getWishPiecesY() {
+        return _wishPiecesY;
+    }
 
-	public void putNetworkSystemProperty(final String pKey, final String pValue) {
-		_networkSystemProperties.put(pKey, pValue);
-	}
+    public void setWishPiecesY(final int pWishPiecesY) {
+        _wishPiecesY = pWishPiecesY;
+    }
 
-	public void setNetworkStack(final String pNetworkStack) {
-		_networkStack = pNetworkStack;
-	}
-
-	public void setRoomName(final String pRoomName) {
-		_roomName = pRoomName;
-	}
-
-	public void setWishPiecesX(final int pWishPiecesX) {
-		_wishPiecesX = pWishPiecesX;
-	}
-
-	public void setWishPiecesY(final int pWishPiecesY) {
-		_wishPiecesY = pWishPiecesY;
-	}
+    public void putNetworkSystemProperty(final String pKey, final String pValue) {
+        _networkSystemProperties.put(pKey, pValue);
+    }
 
 }

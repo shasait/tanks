@@ -16,72 +16,71 @@
 
 package de.hasait.tanks.util.common.input;
 
-import java.io.ObjectStreamException;
-
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
-
 import de.hasait.tanks.util.common.AbstractConfiguredAction;
+
+import java.io.ObjectStreamException;
 
 /**
  *
  */
 public class ControllerButtonAction extends AbstractConfiguredAction {
 
-	private final String _controllerName;
-	private final int _buttonIndex;
+    private final String _controllerName;
+    private final int _buttonIndex;
 
-	private final ControllerListener _listener = new ControllerAdapter() {
+    private final ControllerListener _listener = new ControllerAdapter() {
 
-		@Override
-		public boolean buttonDown(final Controller pController, final int pButtonIndex) {
-			if (_controllerName.equals(pController.getName()) && _buttonIndex == pButtonIndex) {
-				updateState(1.0f);
-				return true;
-			}
-			return super.buttonDown(pController, pButtonIndex);
-		}
+        @Override
+        public boolean buttonDown(final Controller pController, final int pButtonIndex) {
+            if (_controllerName.equals(pController.getName()) && _buttonIndex == pButtonIndex) {
+                updateState(1.0f);
+                return true;
+            }
+            return super.buttonDown(pController, pButtonIndex);
+        }
 
-		@Override
-		public boolean buttonUp(final Controller pController, final int pButtonIndex) {
-			if (_controllerName.equals(pController.getName()) && _buttonIndex == pButtonIndex) {
-				updateState(0.0f);
-				return true;
-			}
-			return super.buttonUp(pController, pButtonIndex);
-		}
+        @Override
+        public boolean buttonUp(final Controller pController, final int pButtonIndex) {
+            if (_controllerName.equals(pController.getName()) && _buttonIndex == pButtonIndex) {
+                updateState(0.0f);
+                return true;
+            }
+            return super.buttonUp(pController, pButtonIndex);
+        }
 
-	};
+    };
 
-	public ControllerButtonAction(final String pControllerName, final int pButtonIndex) {
-		super();
+    public ControllerButtonAction(final String pControllerName, final int pButtonIndex) {
+        super();
 
-		_controllerName = pControllerName;
-		_buttonIndex = pButtonIndex;
-	}
+        _controllerName = pControllerName;
+        _buttonIndex = pButtonIndex;
+    }
 
-	@Override
-	public String toString() {
-		return  "Button " + _buttonIndex;
-	}
+    @Override
+    public String toString() {
+        return "Button " + _buttonIndex;
+    }
 
-	@Override
-	protected void disposeInternal() {
-		Controllers.removeListener(_listener);
-	}
+    @Override
+    protected void disposeInternal() {
+        Controllers.removeListener(_listener);
+    }
 
-	@Override
-	protected void initInternal() {
-		Controllers.addListener(_listener);
-	}
+    @Override
+    protected void initInternal() {
+        Controllers.addListener(_listener);
+    }
 
-	private Object writeReplace() throws ObjectStreamException {
-		final ControllerButtonActionSerialized serialized = new ControllerButtonActionSerialized();
-		serialized._controllerName = _controllerName;
-		serialized._buttonIndex = _buttonIndex;
-		return serialized;
-	}
+    private Object writeReplace() throws ObjectStreamException {
+        final ControllerButtonActionSerialized serialized = new ControllerButtonActionSerialized();
+        serialized._controllerName = _controllerName;
+        serialized._buttonIndex = _buttonIndex;
+        return serialized;
+    }
 
 }

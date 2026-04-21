@@ -16,22 +16,21 @@
 
 package de.hasait.tanks.util.common.input;
 
-import java.io.Serializable;
-
 import com.badlogic.gdx.utils.Disposable;
-
 import de.hasait.tanks.util.common.Abstract2DScreen;
+
+import java.io.Serializable;
 
 /**
  *
  */
 public interface ConfiguredAction extends Disposable, Serializable {
 
-	/**
-	 * @return Return state between 0 and 1.
-	 */
-	float getState();
+    /**
+     * @return Return state between 0 and 1.
+     */
+    float getState();
 
-	void init(final Abstract2DScreen<?> pScreen);
+    void init(final Abstract2DScreen<?> pScreen);
 
 }

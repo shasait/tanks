@@ -24,8 +24,8 @@ import de.hasait.tanks.util.common.Game;
  */
 public class TanksScreenContext extends AbstractScreenContext {
 
-	public TanksScreenContext(Game<TanksScreenContext> pGame) {
-		super(pGame);
-	}
+    public TanksScreenContext(Game<TanksScreenContext> pGame) {
+        super(pGame);
+    }
 
 }
